@@ -1,0 +1,500 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --bg: #100e16;
+    --surface: #191622;
+    --purple: #a78bfa;
+    --purple-bright: #c4b5fd;
+    --text: #f7f3ff;
+    --muted: #aaa3ba;
+    --border: rgba(196, 181, 253, 0.15);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.navbar {
+    min-height: 82px;
+    padding: 18px 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-size: 17px;
+}
+
+.brand > span:last-child {
+    color: var(--purple);
+}
+
+.brand-icon {
+    font-size: 25px;
+}
+
+.navbar nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.navbar nav a:hover {
+    color: var(--text);
+}
+
+.navbar .nav-login {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 17px;
+    color: var(--text);
+}
+
+.hero {
+    min-height: 590px;
+    padding: 70px 7%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 40px;
+    overflow: hidden;
+}
+
+.hero-content {
+    max-width: 560px;
+    position: relative;
+    z-index: 2;
+}
+
+.eyebrow {
+    color: var(--purple);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 18px;
+}
+
+.hero h1 {
+    font-size: clamp(54px, 7vw, 88px);
+    line-height: 0.99;
+    letter-spacing: -4px;
+    font-weight: 800;
+    margin-bottom: 24px;
+}
+
+.hero h1 span,
+.info-section h2 span {
+    color: var(--purple);
+}
+
+.hero-description {
+    color: var(--muted);
+    max-width: 450px;
+    font-size: 14px;
+    line-height: 1.9;
+}
+
+.hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 13px;
+    margin-top: 30px;
+}
+
+.btn {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px 21px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+}
+
+.btn-primary {
+    background: var(--purple);
+    color: #171020;
+}
+
+.btn-primary:hover {
+    background: var(--purple-bright);
+}
+
+.btn-secondary {
+    border: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.game-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-top: 42px;
+}
+
+.game-stats div {
+    display: flex;
+    flex-direction: column;
+}
+
+.game-stats strong {
+    font-size: 22px;
+}
+
+.game-stats span {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+.hero-art {
+    min-height: 400px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
+}
+
+.hero-art::before {
+    content: "";
+    position: absolute;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(124, 58, 237, 0.22),
+        transparent 70%
+    );
+    z-index: -2;
+}
+
+.moon {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #d9ceff;
+    box-shadow: 0 0 60px rgba(196, 181, 253, 0.25);
+    top: 25px;
+    right: 50px;
+}
+
+.mansion {
+    position: relative;
+    width: 300px;
+    height: 265px;
+    margin-top: 90px;
+    filter: drop-shadow(0 0 25px rgba(124, 58, 237, 0.2));
+}
+
+.tower {
+    position: absolute;
+    bottom: 0;
+    width: 85px;
+    height: 180px;
+    background: #282234;
+    border: 1px solid #4d3c64;
+}
+
+.tower-left {
+    left: 10px;
+}
+
+.tower-right {
+    right: 10px;
+    height: 205px;
+}
+
+.roof {
+    position: absolute;
+    top: -58px;
+    left: -9px;
+    width: 100px;
+    height: 65px;
+    background: #382746;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.mansion-main {
+    position: absolute;
+    left: 70px;
+    bottom: 0;
+    width: 160px;
+    height: 195px;
+    background: #30243b;
+    border: 1px solid #59446e;
+}
+
+.main-roof {
+    position: absolute;
+    top: -70px;
+    left: -15px;
+    width: 188px;
+    height: 75px;
+    background: #473253;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.window {
+    position: absolute;
+    width: 22px;
+    height: 36px;
+    background: #bba5ff;
+    border: 4px solid #6a4c7e;
+    box-shadow: 0 0 18px rgba(167, 139, 250, 0.5);
+}
+
+.tower .window {
+    left: 28px;
+    top: 35px;
+}
+
+.window-one {
+    left: 25px;
+    top: 30px;
+}
+
+.window-two {
+    right: 25px;
+    top: 30px;
+}
+
+.door {
+    position: absolute;
+    width: 46px;
+    height: 78px;
+    bottom: 0;
+    left: 56px;
+    border: 2px solid #7c6095;
+    border-bottom: 0;
+    border-radius: 25px 25px 0 0;
+    background: #15101d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d7c5ff;
+}
+
+.floating-ghost {
+    position: absolute;
+    top: 85px;
+    left: 35px;
+    font-size: 50px;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 15px rgba(196, 181, 253, 0.35));
+}
+
+.mist {
+    position: absolute;
+    width: 100px;
+    height: 15px;
+    background: rgba(167, 139, 250, 0.1);
+    border-radius: 50%;
+    filter: blur(8px);
+}
+
+.mist-one {
+    bottom: 40px;
+    left: 10px;
+}
+
+.mist-two {
+    bottom: 70px;
+    right: 0;
+}
+
+.art-caption {
+    position: absolute;
+    bottom: 0;
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(-5deg);
+    }
+    50% {
+        transform: translateY(-15px) rotate(5deg);
+    }
+}
+
+.info-section,
+.how-section {
+    padding: 85px 7%;
+    text-align: center;
+}
+
+.info-section {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: #14111c;
+}
+
+.info-section h2,
+.how-section h2 {
+    font-size: clamp(25px, 4vw, 38px);
+    margin-bottom: 18px;
+    letter-spacing: -1px;
+}
+
+.info-section > p:last-child {
+    max-width: 610px;
+    margin: 0 auto;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1050px;
+    margin: 38px auto 0;
+    text-align: left;
+}
+
+.step-card {
+    padding: 27px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--surface);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.step-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--purple);
+}
+
+.step-number {
+    display: inline-block;
+    color: var(--purple);
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.step-card h3 {
+    font-size: 17px;
+    margin-bottom: 10px;
+}
+
+.step-card p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.site-footer {
+    border-top: 1px solid var(--border);
+    padding: 25px 7%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.site-footer p {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+@media (max-width: 800px) {
+    .hero {
+        grid-template-columns: 1fr;
+        padding-top: 55px;
+        gap: 20px;
+    }
+
+    .hero-art {
+        min-height: 390px;
+    }
+
+    .steps {
+        grid-template-columns: 1fr;
+    }
+
+    .game-stats {
+        gap: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 15px 5%;
+    }
+
+    .navbar nav {
+        gap: 12px;
+        font-size: 11px;
+    }
+
+    .navbar nav a:first-child,
+    .navbar nav a:nth-child(2) {
+        display: none;
+    }
+
+    .hero {
+        padding: 45px 6%;
+    }
+
+    .hero h1 {
+        letter-spacing: -2px;
+    }
+
+    .hero-art {
+        transform: scale(0.88);
+        margin: -15px -20px;
+    }
+
+    .info-section,
+    .how-section {
+        padding: 65px 6%;
+    }
+
+    .site-footer {
+        flex-direction: column;
+        text-align: center;
+    }
+}
