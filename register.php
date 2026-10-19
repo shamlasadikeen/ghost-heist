@@ -1,4 +1,5 @@
 
+
 <?php
 session_start();
 
@@ -9,6 +10,61 @@ if (isset($_SESSION['user_id'])) {
 
 $error = $_SESSION['register_error'] ?? '';
 unset($_SESSION['register_error']);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/config.php';
+
+    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if (strlen($username) < 3 || strlen($username) > 50) {
+        $error = 'Username must be between 3 and 50 characters.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address.';
+    } elseif (strlen($email) > 100) {
+        $error = 'Email address is too long.';
+    } elseif (strlen($password) < 8) {
+        $error = 'Password must contain at least 8 characters.';
+    } else {
+        try {
+            $check = $pdo->prepare(
+                'SELECT id FROM users WHERE username = ? OR email = ? LIMIT 1'
+            );
+            $check->execute([$username, $email]);
+
+            if ($check->fetch()) {
+                $error = 'That username or email is already registered.';
+            } else {
+                $hashedPassword = password_hash(
+                    $password,
+                    PASSWORD_DEFAULT
+                );
+
+                $stmt = $pdo->prepare(
+                    'INSERT INTO users (username, email, password)
+                     VALUES (?, ?, ?)'
+                );
+
+                $stmt->execute([
+                    $username,
+                    $email,
+                    $hashedPassword
+                ]);
+
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = (int) $pdo->lastInsertId();
+                $_SESSION['username'] = $username;
+
+                header('Location: pages/dashboard.php');
+                exit;
+            }
+        } catch (PDOException $e) {
+            error_log('Ghost Heist registration error: ' . $e->getMessage());
+            $error = 'Registration could not be completed. Please try again.';
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
