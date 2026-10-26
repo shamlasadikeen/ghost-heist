@@ -252,7 +252,7 @@ if ($room === false || $room === null || $room < 1 || $room > 5) {
     <section class="game-card">
 
         <div class="room-number" id="room-label">
-            Room <?= $room ?> —
+            Room <?= $room ?> -
             <?= htmlspecialchars([
                 1 => 'The Forgotten Entrance',
                 2 => 'The Whispering Hall',
@@ -358,7 +358,7 @@ function updateRoomDisplay() {
         `${currentRoom} / 5`;
 
     document.getElementById('room-label').textContent =
-        `Room ${currentRoom} — ${roomNames[currentRoom - 1]}`;
+        'Room ' + currentRoom + ' - ' + roomNames[currentRoom - 1];
 
     document.getElementById('progress-fill').style.width =
         `${currentRoom * 20}%`;
@@ -505,7 +505,7 @@ answerForm.addEventListener('submit', async (event) => {
 
             puzzleStatus.hidden = false;
             puzzleStatus.textContent =
-                '🏆 You completed all five rooms and found the treasure!';
+                'You completed all five rooms and found the treasure!';
 
             document.getElementById('progress-fill').style.width = '100%';
 
