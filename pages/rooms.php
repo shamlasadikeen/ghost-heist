@@ -25,33 +25,28 @@ if (!isset($levels[$difficulty])) {
 $rooms = [
     1 => [
         'name' => 'The Forgotten Entrance',
-        'description' => 'Every heist begins at the entrance.',
-        'symbol' => '♜',
-        'art' => 'entrance'
+        'description' => 'The mansion doors creak open. Your nightmare begins here.',
+        'image' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=85'
     ],
     2 => [
         'name' => 'The Whispering Hall',
-        'description' => 'Something is waiting in the shadows.',
-        'symbol' => '♧',
-        'art' => 'hall'
+        'description' => 'Whispers follow you. Something moves behind the walls.',
+        'image' => 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1000&q=85'
     ],
     3 => [
         'name' => 'The Shadow Library',
-        'description' => 'Ancient secrets guard the next door.',
-        'symbol' => '▤',
-        'art' => 'library'
+        'description' => 'Forbidden books conceal the secrets of the dead.',
+        'image' => 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1000&q=85'
     ],
     4 => [
         'name' => 'The Ghost Chamber',
-        'description' => 'Face the mysteries of the mansion.',
-        'symbol' => '☽',
-        'art' => 'chamber'
+        'description' => 'The shadows are alive. Do not trust what you see.',
+        'image' => 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=85'
     ],
     5 => [
         'name' => 'The Treasure Vault',
-        'description' => 'The hidden treasure awaits.',
-        'symbol' => '♛',
-        'art' => 'vault'
+        'description' => 'The final door stands between you and the treasure.',
+        'image' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=85'
     ]
 ];
 
@@ -63,14 +58,12 @@ try {
     );
     $stmt->execute([$userId, $difficulty]);
 
-    $completedRooms = array_map(
+    $completedRooms = array_values(array_unique(array_map(
         'intval',
         $stmt->fetchAll(PDO::FETCH_COLUMN)
-    );
+    )));
 
-    $stmt = $pdo->prepare(
-        'SELECT coins FROM users WHERE id = ?'
-    );
+    $stmt = $pdo->prepare('SELECT coins FROM users WHERE id = ?');
     $stmt->execute([$userId]);
     $coins = (int) $stmt->fetchColumn();
 
@@ -80,422 +73,567 @@ try {
     exit('Could not load your mansion progress. Please try again.');
 }
 
-$completedCount = count($completedRooms);
-$nextRoom = $completedCount < 5 ? $completedCount + 1 : null;
-$allCompleted = $completedCount === 5;
+/* Unlock the first incomplete room only. */
+$nextRoom = null;
 
+foreach (array_keys($rooms) as $roomNumber) {
+    if (!in_array($roomNumber, $completedRooms, true)) {
+        $nextRoom = $roomNumber;
+        break;
+    }
+}
+
+$completedCount = count(array_intersect(
+    array_keys($rooms),
+    $completedRooms
+));
+
+$allCompleted = $completedCount === count($rooms);
 $username = $_SESSION['username'] ?? 'Heister';
-
-$roomNames = array_column($rooms, 'name');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080608">
 
     <title>The Mansion | Ghost Heist</title>
 
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg: #0c0a12;
-            --panel: #171321;
-            --panel-light: #201a2d;
-            --purple: #a78bfa;
-            --purple-light: #c4b5fd;
-            --gold: #f5c96b;
-            --text: #f5f0ff;
-            --muted: #aaa1ba;
-            --border: #393047;
+            --red: #e51e35;
+            --red-light: #ff4255;
+            --gold: #e8bc71;
+            --text: #f7f1f1;
+            --muted: #b7a9ae;
+            --panel: rgba(17, 12, 17, .92);
+            --border: rgba(255, 255, 255, .12);
         }
 
         * {
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            margin: 0;
+            position: relative;
+            isolation: isolate;
             min-height: 100vh;
-            background:
-                radial-gradient(ellipse at 50% 0%, #302044 0%, transparent 48%),
-                var(--bg);
+            margin: 0;
+            overflow-x: hidden;
+            background: #080608;
             color: var(--text);
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -3;
+            pointer-events: none;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(8, 5, 8, .76),
+                    rgba(8, 5, 8, .94)
+                ),
+                url("https://images.unsplash.com/photo-1657265514497-02611707af59?auto=format&fit=crop&fm=jpg&q=85&w=2400")
+                center / cover no-repeat;
+            transform: scale(1.03);
+            animation: mansionReveal 2s ease-out both;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: -25%;
+            z-index: -2;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 20% 60%, #a30c281f, transparent 35%),
+                radial-gradient(ellipse at 80% 30%, #d7193517, transparent 35%);
+            filter: blur(35px);
+            animation: fogDrift 20s ease-in-out infinite alternate;
+        }
+
+        button,
+        a {
+            font: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Rain animation */
+
+        .rain {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: .25;
         }
 
         .map-shell {
-            width: min(1180px, 94%);
+            position: relative;
+            width: min(1240px, 92%);
             margin: auto;
-            padding: 24px 0 60px;
+            padding: 22px 0 35px;
         }
+
+        /* Navigation and branding */
 
         .topbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 16px;
+            gap: 18px;
             flex-wrap: wrap;
+            padding: 8px 0 20px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .brand {
-            color: var(--purple-light);
-            font-size: 1.15rem;
-            font-weight: 800;
-            letter-spacing: 2px;
+        /* Override conflicting styles from style.css */
+        .topbar .brand,
+        .topbar a.brand {
+            color: #ffffff !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 1rem !important;
+            font-weight: 800 !important;
+            letter-spacing: 3px !important;
+            text-decoration: none !important;
+            text-shadow: none !important;
+        }
+
+        .topbar .brand span,
+        .topbar a.brand span {
+            color: #ff3048 !important;
+            text-shadow:
+                0 0 8px rgba(255, 48, 72, .7),
+                0 0 22px rgba(229, 30, 53, .45) !important;
+        }
+
+        .topbar .brand:hover,
+        .topbar a.brand:hover {
+            color: #ffffff !important;
+        }
+
+        .topbar .brand:hover span,
+        .topbar a.brand:hover span {
+            color: #ff6576 !important;
         }
 
         .top-links {
             display: flex;
             align-items: center;
             gap: 20px;
+            flex-wrap: wrap;
         }
 
-        .top-links a {
-            color: var(--muted);
+        .top-links a,
+        .sound-toggle {
+            padding: 8px 0;
+            border: 0;
+            background: transparent;
+            color: #ded3d7;
+            font-size: .82rem;
             text-decoration: none;
-            font-size: .92rem;
+            cursor: pointer;
+            transition: color .2s;
         }
 
-        .top-links a:hover {
-            color: var(--purple-light);
+        .top-links a:hover,
+        .sound-toggle:hover {
+            color: var(--red-light);
         }
 
-        .hero {
-            position: relative;
-            isolation: isolate;
-            overflow: hidden;
-            margin-top: 30px;
-            padding: clamp(28px, 6vw, 62px);
-            border: 1px solid #4b3b60;
-            border-radius: 24px;
-            background:
-                linear-gradient(90deg, rgba(12,10,18,.97), rgba(12,10,18,.72)),
-                radial-gradient(ellipse at 75% 40%, #7851a5, transparent 52%),
-                linear-gradient(135deg, #332342, #15101f 75%);
-            box-shadow: 0 25px 70px #0005;
+        .sound-toggle {
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #100b0de8;
         }
 
-        .hero::after {
-            content: "♜";
-            position: absolute;
-            z-index: -1;
-            right: 5%;
-            top: -50px;
-            color: #c4b5fd0d;
-            font-size: clamp(200px, 36vw, 410px);
-            line-height: 1;
-            transform: rotate(-8deg);
+        .sound-toggle:focus-visible,
+        a:focus-visible {
+            outline: 2px solid var(--red-light);
+            outline-offset: 4px;
+        }
+
+        /* Page heading */
+
+        .room-heading {
+            margin: 25px 0 20px;
         }
 
         .eyebrow {
-            color: var(--gold);
-            font-size: .76rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 0 8px;
+            color: var(--red-light);
+            font-size: .7rem;
             font-weight: 800;
             letter-spacing: 3px;
             text-transform: uppercase;
         }
 
-        .hero h1 {
-            max-width: 650px;
-            margin: 14px 0;
-            font-family: Georgia, serif;
-            font-size: clamp(2.4rem, 6vw, 4.5rem);
+        .eyebrow::before {
+            content: "";
+            width: 23px;
+            height: 1px;
+            background: var(--red-light);
+        }
+
+        .room-heading h1 {
+            margin: 0;
+            font-family: 'Creepster', cursive;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 400;
             line-height: 1.05;
+            text-shadow: 0 0 28px #e51e3525;
         }
 
-        .hero h1 span {
-            color: var(--purple-light);
+        .room-heading h1 span {
+            color: var(--red-light);
         }
 
-        .hero p {
-            max-width: 530px;
-            color: #c0b6d0;
-            line-height: 1.8;
-        }
-
-        .hero-bottom {
+        .heading-bottom {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
+            gap: 14px;
             flex-wrap: wrap;
-            margin-top: 28px;
+            margin-top: 12px;
+        }
+
+        .heading-description {
+            margin: 0;
+            color: var(--muted);
+            font-size: .84rem;
+            line-height: 1.7;
+        }
+
+        .room-stats {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .stat-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            padding: 11px 15px;
+            padding: 9px 12px;
             border: 1px solid var(--border);
-            border-radius: 10px;
-            background: #171321cf;
-            font-size: .9rem;
+            border-radius: 8px;
+            background: #100b0de8;
+            color: #e7dce0;
+            font-size: .76rem;
         }
 
-        .gold {
+        .stat-pill .gold {
             color: var(--gold);
         }
 
-        .section-heading {
+        /* Difficulty selection */
+
+        .directory-toolbar {
             display: flex;
             justify-content: space-between;
-            align-items: end;
+            align-items: center;
             gap: 15px;
             flex-wrap: wrap;
-            margin: 42px 0 20px;
+            margin: 23px 0 17px;
         }
 
-        .section-heading h2 {
-            margin: 0 0 8px;
-            font-family: Georgia, serif;
-            font-size: clamp(1.7rem, 4vw, 2.4rem);
-        }
-
-        .section-heading p {
+        .directory-toolbar p {
             margin: 0;
             color: var(--muted);
-            line-height: 1.6;
+            font-size: .8rem;
         }
 
         .difficulty-switch {
             display: flex;
-            gap: 5px;
-            padding: 5px;
+            gap: 4px;
+            padding: 4px;
             border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--panel);
+            border-radius: 9px;
+            background: #0d090ce8;
         }
 
         .difficulty-switch a {
-            padding: 10px 13px;
-            border-radius: 8px;
-            color: var(--muted);
-            font-size: .83rem;
+            padding: 9px 12px;
+            border-radius: 6px;
+            color: #c5b8bd;
+            font-size: .76rem;
             text-decoration: none;
+            transition: background .2s, color .2s;
+        }
+
+        .difficulty-switch a:hover {
+            color: white;
         }
 
         .difficulty-switch a.active {
-            background: var(--purple);
-            color: #171321;
+            background: var(--red);
+            color: white;
             font-weight: 800;
+            box-shadow: 0 0 18px #e51e352d;
         }
 
-        .map-banner {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            padding: 16px 20px;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            background: linear-gradient(100deg, #1d172a, #15111d);
-        }
-
-        .map-banner strong {
-            color: var(--purple-light);
-        }
-
-        .map-banner span {
-            color: var(--muted);
-            font-size: .9rem;
-        }
+        /* Room cards */
 
         .room-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 20px;
+            gap: 18px;
         }
 
         .room-card {
             position: relative;
-            display: flex;
-            flex-direction: column;
             min-width: 0;
             overflow: hidden;
-            border: 1px solid var(--border);
-            border-radius: 17px;
+            border: 1px solid #ffffff1c;
+            border-radius: 12px;
             background: var(--panel);
-            transition: transform .2s, border-color .2s, box-shadow .2s;
+            box-shadow: 0 12px 35px #0006;
+            animation: riseIn .65s ease-out both;
+            transition:
+                transform .25s,
+                border-color .25s,
+                box-shadow .25s;
         }
+
+        .room-card:nth-child(2) { animation-delay: .07s; }
+        .room-card:nth-child(3) { animation-delay: .14s; }
+        .room-card:nth-child(4) { animation-delay: .21s; }
+        .room-card:nth-child(5) { animation-delay: .28s; }
 
         .room-card.available:hover {
             transform: translateY(-5px);
-            border-color: var(--purple);
-            box-shadow: 0 14px 35px #0005, 0 0 22px #a78bfa12;
+            border-color: #ff425599;
+            box-shadow: 0 18px 42px #000a, 0 0 24px #e51e351c;
+        }
+
+        .room-card.completed {
+            border-color: #e8bc7155;
         }
 
         .room-art {
             position: relative;
-            display: grid;
-            place-items: center;
-            min-height: 175px;
+            isolation: isolate;
+            min-height: 250px;
             overflow: hidden;
-            border-bottom: 1px solid var(--border);
-            background:
-                radial-gradient(ellipse at 50% 100%, #8b5cc64d, transparent 60%),
-                linear-gradient(145deg, #30223f, #171321 72%);
+            background: #160b10;
         }
 
         .room-art::before {
             content: "";
             position: absolute;
-            width: 150px;
-            height: 150px;
-            border: 1px solid #c4b5fd20;
-            border-radius: 50%;
+            inset: -5px;
+            z-index: -2;
+            background-image: var(--room-image);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            filter: blur(2px) brightness(.65);
+            transform: scale(1.03);
+            transition: filter .35s ease, transform .6s ease;
+        }
+
+        .room-card.available:hover .room-art::before {
+            filter: blur(0) brightness(.82);
+            transform: scale(1.08);
+        }
+
+        .image-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(8, 5, 8, .3),
+                    rgba(8, 5, 8, .08) 35%,
+                    rgba(8, 5, 8, .82) 75%,
+                    rgba(8, 5, 8, .98)
+                ),
+                linear-gradient(
+                    100deg,
+                    rgba(40, 0, 8, .25),
+                    transparent 60%,
+                    rgba(0, 0, 0, .25)
+                );
         }
 
         .room-art::after {
             content: "";
             position: absolute;
-            width: 100%;
-            height: 1px;
-            bottom: 25px;
-            background: linear-gradient(90deg, transparent, #a78bfa55, transparent);
+            right: -25%;
+            bottom: 0;
+            left: -25%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff4255b0, transparent);
+            box-shadow: 0 0 18px #e51e3550;
+            animation: lightSweep 5s ease-in-out infinite;
         }
 
-        .room-art .symbol {
-            position: relative;
-            z-index: 1;
-            color: var(--purple-light);
-            font-family: Georgia, serif;
-            font-size: 5rem;
-            text-shadow: 0 0 32px #a78bfa80;
-        }
-
-        .room-art .room-index {
+        .room-index {
             position: absolute;
+            top: 15px;
             left: 15px;
-            top: 14px;
-            color: #ffffff90;
-            font-size: .76rem;
+            z-index: 2;
+            padding: 7px 9px;
+            border: 1px solid #ffffff30;
+            border-radius: 5px;
+            background: #080608d9;
+            color: #fff;
+            font-size: .64rem;
+            font-weight: 800;
             letter-spacing: 2px;
+            backdrop-filter: blur(8px);
         }
 
-        .room-art .status-icon {
+        .status-icon {
             position: absolute;
-            right: 14px;
             top: 13px;
+            right: 13px;
+            z-index: 2;
             display: grid;
+            width: 36px;
+            height: 36px;
             place-items: center;
-            width: 34px;
-            height: 34px;
-            border: 1px solid #ffffff25;
+            border: 1px solid #ffffff3b;
             border-radius: 50%;
-            background: #100d18a8;
+            background: #080608e8;
+            color: var(--red-light);
             font-size: 1rem;
+            backdrop-filter: blur(8px);
         }
 
-        .room-card.locked .room-art {
-            filter: saturate(.45);
+        .room-card.locked .room-art::before {
+            filter: blur(3px) brightness(.35) saturate(.5);
         }
 
-        .room-card.locked .symbol {
-            color: #777080;
-            text-shadow: none;
+        .room-card.locked .image-overlay {
+            background: linear-gradient(
+                180deg,
+                rgba(0, 0, 0, .48),
+                rgba(8, 5, 8, .55) 35%,
+                rgba(8, 5, 8, .98)
+            );
         }
 
-        .room-card.completed {
-            border-color: #a68a4b80;
-        }
-
-        .room-card.completed .room-art {
-            background:
-                radial-gradient(ellipse at 50% 100%, #d6a84340, transparent 60%),
-                linear-gradient(145deg, #382e24, #171321 72%);
-        }
-
-        .room-card.completed .symbol {
-            color: var(--gold);
-            text-shadow: 0 0 30px #f5c96b55;
+        .room-card.locked .status-icon {
+            color: #e5dce0;
+            border-color: #ffffff40;
         }
 
         .room-card.completed .status-icon {
             color: var(--gold);
-            border-color: #f5c96b55;
+            border-color: #e8bc7180;
         }
 
-        .room-content {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-            padding: 19px;
+        .image-title {
+            position: absolute;
+            right: 18px;
+            bottom: 17px;
+            left: 18px;
+            z-index: 2;
         }
 
-        .room-status {
-            margin-bottom: 10px;
-            color: var(--purple-light);
-            font-size: .7rem;
+        .image-title span {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--red-light);
+            font-size: .62rem;
             font-weight: 800;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
-        .room-card.completed .room-status {
+        .room-card.locked .image-title span {
+            color: #bcb0b5;
+        }
+
+        .room-card.completed .image-title span {
             color: var(--gold);
         }
 
-        .room-card.locked .room-status {
-            color: #8f879b;
+        .image-title h2 {
+            margin: 0;
+            font-family: 'Creepster', cursive;
+            font-size: clamp(1.65rem, 2.5vw, 2.1rem);
+            font-weight: 400;
+            line-height: 1.15;
+            text-shadow: 0 3px 15px #000;
         }
 
-        .room-content h3 {
-            margin: 0 0 9px;
-            font-family: Georgia, serif;
-            font-size: 1.25rem;
-            line-height: 1.35;
+        /* Room actions */
+
+        .room-content {
+            padding: 14px 17px 17px;
+            border-top: 1px solid #ffffff12;
         }
 
         .room-content p {
-            flex: 1;
-            margin: 0 0 20px;
+            min-height: 42px;
+            margin: 0 0 13px;
             color: var(--muted);
-            font-size: .88rem;
-            line-height: 1.65;
+            font-size: .77rem;
+            line-height: 1.7;
         }
 
         .room-action {
             display: block;
             width: 100%;
-            padding: 12px;
-            border: 1px solid #a78bfa50;
-            border-radius: 9px;
-            background: #a78bfa;
-            color: #171321;
+            padding: 11px 12px;
+            border: 1px solid #ff42556b;
+            border-radius: 7px;
+            background: linear-gradient(100deg, #b6112b, #e51e35);
+            color: #fff;
+            font-size: .78rem;
             font-weight: 800;
             text-align: center;
             text-decoration: none;
-            transition: background .2s;
+            transition: background .2s, box-shadow .2s, transform .2s;
         }
 
-        .room-action:hover {
-            background: var(--purple-light);
+        a.room-action:hover {
+            background: linear-gradient(100deg, #d51734, #ff4255);
+            box-shadow: 0 0 20px #e51e3530;
+            transform: translateY(-1px);
         }
 
         .room-card.completed .room-action {
-            border-color: #f5c96b50;
-            background: #f5c96b12;
+            border-color: #e8bc7140;
+            background: #e8bc7110;
             color: var(--gold);
         }
 
         .room-card.locked .room-action {
-            border-color: var(--border);
-            background: #211c2a;
-            color: #8f879b;
+            border-color: #ffffff12;
+            background: #ffffff06;
+            color: #a49aa0;
             cursor: not-allowed;
         }
 
         .bottom-note {
-            margin-top: 28px;
-            padding: 18px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
+            margin-top: 22px;
+            padding: 15px 18px;
+            border: 1px solid #ffffff17;
+            border-radius: 9px;
+            background: #100b0de8;
             color: var(--muted);
-            font-size: .9rem;
+            font-size: .8rem;
             line-height: 1.7;
             text-align: center;
         }
@@ -504,23 +642,87 @@ $roomNames = array_column($rooms, 'name');
             color: var(--gold);
         }
 
-        @media (max-width: 850px) {
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+            padding-top: 17px;
+            border-top: 1px solid #ffffff17;
+            color: #95868d;
+            font-size: .72rem;
+        }
+
+        .footer span:last-child {
+            color: #c7a2a9;
+        }
+
+        /* Animations */
+
+        @keyframes mansionReveal {
+            from { opacity: .5; transform: scale(1.08); }
+            to { opacity: 1; transform: scale(1.03); }
+        }
+
+        @keyframes fogDrift {
+            from { transform: translate3d(-2%, 1%, 0) scale(1); }
+            to { transform: translate3d(3%, -2%, 0) scale(1.08); }
+        }
+
+        @keyframes lightSweep {
+            0%, 100% { transform: translateY(-15px); opacity: .2; }
+            50% { transform: translateY(0); opacity: .9; }
+        }
+
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive layout */
+
+        @media (max-width: 900px) {
             .room-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
-        }
-
-        @media (max-width: 540px) {
-            .room-grid {
-                grid-template-columns: 1fr;
-            }
 
             .room-art {
-                min-height: 150px;
+                min-height: 230px;
+            }
+        }
+
+        @media (max-width: 580px) {
+            .map-shell {
+                width: 92%;
+                padding-top: 15px;
+            }
+
+            .topbar {
+                align-items: flex-start;
             }
 
             .top-links {
                 gap: 12px;
+            }
+
+            .top-links a,
+            .sound-toggle {
+                font-size: .74rem;
+            }
+
+            .room-heading {
+                margin-top: 22px;
+            }
+
+            .room-heading h1 {
+                font-size: clamp(2.5rem, 12vw, 3.5rem);
+            }
+
+            .heading-bottom,
+            .directory-toolbar {
+                align-items: flex-start;
+                flex-direction: column;
             }
 
             .difficulty-switch {
@@ -529,55 +731,94 @@ $roomNames = array_column($rooms, 'name');
 
             .difficulty-switch a {
                 flex: 1;
+                padding: 10px 4px;
                 text-align: center;
+            }
+
+            .room-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .room-art {
+                min-height: 250px;
+            }
+
+            .image-title h2 {
+                font-size: 2rem;
+            }
+
+            .room-content p {
+                min-height: 0;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
             }
         }
     </style>
 </head>
+
 <body>
+<canvas class="rain" id="rainCanvas" aria-hidden="true"></canvas>
+
 <main class="map-shell">
 
     <nav class="topbar">
-        <div class="brand">GHOST HEIST</div>
+        <a class="brand" href="../index.php">
+            <span>GHOST</span> HEIST
+        </a>
 
         <div class="top-links">
+            <button
+                class="sound-toggle"
+                id="soundToggle"
+                type="button"
+                aria-pressed="false"
+            >♫ Sound: Off</button>
+
             <a href="dashboard.php">&larr; Dashboard</a>
             <a href="leaderboard.php">Leaderboard</a>
-            <a href="../logout.php">Exit</a>
+            <a href="../logout.php">Exit ↗</a>
         </div>
     </nav>
 
-    <header class="hero">
-        <div class="eyebrow">Your adventure begins here</div>
+    <header class="room-heading">
+        <p class="eyebrow">Enter if you dare</p>
 
-        <h1>Enter the <span>Haunted Mansion.</span></h1>
+        <h1>Choose Your <span>Nightmare</span></h1>
 
-        <p>
-            Five mysterious rooms. Five puzzles. One hidden treasure.
-            Outsmart the ghosts, unlock every door, and claim your reward.
-        </p>
+        <div class="heading-bottom">
+            <p class="heading-description">
+                Five cursed rooms. Complete each one to unlock the next.
+            </p>
 
-        <div class="hero-bottom">
-            <div class="stat-pill">
-                <span class="gold">✦</span>
-                <span><?= number_format($coins) ?> coins</span>
-            </div>
+            <div class="room-stats">
+                <div class="stat-pill">
+                    <span class="gold">✦</span>
+                    <?= number_format($coins) ?> coins
+                </div>
 
-            <div class="stat-pill">
-                <span>◈</span>
-                <span><?= $completedCount ?> of 5 rooms completed</span>
+                <div class="stat-pill">
+                    ☠ <?= $completedCount ?> / 5 rooms completed
+                </div>
             </div>
         </div>
     </header>
 
-    <section class="section-heading">
-        <div>
-            <h2>The Mansion Map</h2>
-            <p>
-                Welcome back, <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?>.
-                Choose your next destination.
-            </p>
-        </div>
+    <div class="directory-toolbar">
+        <p>
+            Welcome back,
+            <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?>.
+            The mansion remembers you.
+        </p>
 
         <nav class="difficulty-switch" aria-label="Choose difficulty">
             <?php foreach ($levels as $key => $label): ?>
@@ -585,90 +826,79 @@ $roomNames = array_column($rooms, 'name');
                     href="rooms.php?difficulty=<?= urlencode($key) ?>"
                     class="<?= $difficulty === $key ? 'active' : '' ?>"
                     <?= $difficulty === $key ? 'aria-current="page"' : '' ?>
-                >
-                    <?= htmlspecialchars($label) ?>
-                </a>
+                ><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></a>
             <?php endforeach; ?>
         </nav>
-    </section>
-
-    <div class="map-banner">
-        <div>
-            <strong><?= htmlspecialchars($levels[$difficulty]) ?> Mode</strong>
-            <span> — Your progress is saved separately for each difficulty.</span>
-        </div>
-
-        <span>✦ 100 coins per room</span>
     </div>
 
     <section class="room-grid" aria-label="Five mansion rooms">
-
         <?php foreach ($rooms as $number => $roomData): ?>
             <?php
                 $isCompleted = in_array($number, $completedRooms, true);
                 $isUnlocked = $isCompleted || $number === $nextRoom;
+
                 $cardClass = $isCompleted
                     ? 'completed'
                     : ($isUnlocked ? 'available' : 'locked');
 
                 if ($isCompleted) {
-                    $status = 'Completed';
+                    $status = 'Room cleared';
                     $icon = '✓';
-                    $action = 'Replay unavailable';
+                    $action = 'Treasure secured';
                 } elseif ($isUnlocked) {
-                    $status = 'Unlocked';
+                    $status = 'Door unlocked';
                     $icon = '↗';
                     $action = 'Enter Room';
                 } else {
-                    $status = 'Locked';
+                    $status = 'Access denied';
                     $icon = '🔒';
                     $action = 'Complete Previous Room';
                 }
             ?>
 
             <article class="room-card <?= $cardClass ?>">
-                <div class="room-art">
+                <div
+                    class="room-art"
+                    style="--room-image: url('<?= htmlspecialchars($roomData['image'], ENT_QUOTES, 'UTF-8') ?>');"
+                >
+                    <div class="image-overlay"></div>
+
                     <span class="room-index">
                         ROOM <?= str_pad((string) $number, 2, '0', STR_PAD_LEFT) ?>
                     </span>
 
-                    <span class="status-icon" aria-label="<?= $status ?>">
-                        <?= $icon ?>
-                    </span>
+                    <span
+                        class="status-icon"
+                        aria-label="<?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>"
+                        title="<?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>"
+                    ><?= $icon ?></span>
 
-                    <span class="symbol" aria-hidden="true">
-                        <?= $roomData['symbol'] ?>
-                    </span>
+                    <div class="image-title">
+                        <span><?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?></span>
+                        <h2><?= htmlspecialchars($roomData['name'], ENT_QUOTES, 'UTF-8') ?></h2>
+                    </div>
                 </div>
 
                 <div class="room-content">
-                    <div class="room-status"><?= $status ?></div>
-
-                    <h3><?= htmlspecialchars($roomData['name']) ?></h3>
-
-                    <p><?= htmlspecialchars($roomData['description']) ?></p>
+                    <p><?= htmlspecialchars($roomData['description'], ENT_QUOTES, 'UTF-8') ?></p>
 
                     <?php if ($isUnlocked && !$isCompleted): ?>
                         <a
                             class="room-action"
                             href="game.php?difficulty=<?= urlencode($difficulty) ?>&room=<?= $number ?>"
-                        >
-                            <?= $action ?> &rarr;
-                        </a>
+                        ><?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?> &rarr;</a>
+
                     <?php elseif ($isCompleted): ?>
-                        <div class="room-action">
-                            ✓ Treasure secured
-                        </div>
+                        <div class="room-action">✓ Treasure secured</div>
+
                     <?php else: ?>
                         <div class="room-action" aria-disabled="true">
-                            🔒 <?= $action ?>
+                            🔒 <?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>
                         </div>
                     <?php endif; ?>
                 </div>
             </article>
-
         <?php endforeach; ?>
-
     </section>
 
     <div class="bottom-note">
@@ -676,12 +906,238 @@ $roomNames = array_column($rooms, 'name');
             <strong>All five rooms conquered!</strong>
             You've completed this difficulty. The treasure is yours!
         <?php else: ?>
-            <strong>Heist tip:</strong>
-            Solve the current room to unlock the next door.
-            Each new room rewards you with 100 coins.
+            <strong>Survival tip:</strong>
+            Solve the current room to break its curse and unlock the next door.
         <?php endif; ?>
     </div>
 
+    <footer class="footer">
+        <span>GHOST HEIST &copy; <?= date('Y') ?></span>
+        <span>Think fast. Stay brave. Fear nothing.</span>
+    </footer>
+
 </main>
+
+<script>
+/* Atmospheric rain effect */
+(() => {
+    const canvas = document.getElementById('rainCanvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return;
+
+    const reduceMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    if (reduceMotion) {
+        canvas.hidden = true;
+        return;
+    }
+
+    let drops = [];
+    let width = 0;
+    let height = 0;
+    let animationFrame = null;
+    let isPaused = false;
+
+    function resizeCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+
+        const count = Math.min(150, Math.floor(width / 8));
+
+        drops = Array.from({ length: count }, () => ({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            length: 8 + Math.random() * 18,
+            speed: 5 + Math.random() * 8,
+            opacity: 0.08 + Math.random() * 0.22
+        }));
+    }
+
+    function drawRain() {
+        if (isPaused) return;
+
+        ctx.clearRect(0, 0, width, height);
+        ctx.lineWidth = 1;
+
+        drops.forEach(drop => {
+            ctx.strokeStyle = `rgba(220, 205, 215, ${drop.opacity})`;
+            ctx.beginPath();
+            ctx.moveTo(drop.x, drop.y);
+            ctx.lineTo(drop.x - 2, drop.y + drop.length);
+            ctx.stroke();
+
+            drop.y += drop.speed;
+            drop.x -= 0.7;
+
+            if (drop.y > height) {
+                drop.y = -drop.length;
+                drop.x = Math.random() * width;
+            }
+
+            if (drop.x < 0) {
+                drop.x = width;
+            }
+        });
+
+        animationFrame = requestAnimationFrame(drawRain);
+    }
+
+    function pauseRain() {
+        isPaused = true;
+
+        if (animationFrame !== null) {
+            cancelAnimationFrame(animationFrame);
+            animationFrame = null;
+        }
+    }
+
+    function resumeRain() {
+        if (!isPaused) return;
+
+        isPaused = false;
+        drawRain();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            pauseRain();
+        } else {
+            resumeRain();
+        }
+    });
+
+    resizeCanvas();
+    drawRain();
+})();
+
+/*
+ * Ambient horror sound.
+ * Audio starts only after the user presses the sound button.
+ */
+(() => {
+    const button = document.getElementById('soundToggle');
+
+    let audioContext = null;
+    let masterGain = null;
+    let enabled = false;
+    let starting = false;
+    let oscillators = [];
+
+    function setButtonState(isEnabled) {
+        button.textContent = isEnabled
+            ? '♫ Sound: On'
+            : '♫ Sound: Off';
+
+        button.setAttribute('aria-pressed', String(isEnabled));
+    }
+
+    async function startSound() {
+        if (starting || enabled) return;
+
+        starting = true;
+        button.textContent = '♫ Starting sound...';
+
+        const AudioContextClass =
+            window.AudioContext || window.webkitAudioContext;
+
+        if (!AudioContextClass) {
+            button.textContent = 'Sound not supported';
+            starting = false;
+            return;
+        }
+
+        try {
+            if (!audioContext || audioContext.state === 'closed') {
+                audioContext = new AudioContextClass();
+                masterGain = audioContext.createGain();
+
+                /* Keep the sound at a moderate volume. */
+                masterGain.gain.value = 0;
+                masterGain.connect(audioContext.destination);
+
+                const tones = [
+                    { frequency: 55, volume: 0.45, type: 'sine' },
+                    { frequency: 82.41, volume: 0.18, type: 'triangle' },
+                    { frequency: 110, volume: 0.08, type: 'sine' }
+                ];
+
+                tones.forEach(tone => {
+                    const oscillator = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+
+                    oscillator.type = tone.type;
+                    oscillator.frequency.value = tone.frequency;
+                    gain.gain.value = tone.volume;
+
+                    oscillator.connect(gain);
+                    gain.connect(masterGain);
+                    oscillator.start();
+
+                    oscillators.push(oscillator);
+                });
+            }
+
+            await audioContext.resume();
+
+            if (audioContext.state !== 'running') {
+                throw new Error('The browser did not start the audio context.');
+            }
+
+            masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+            masterGain.gain.setTargetAtTime(
+                0.22,
+                audioContext.currentTime,
+                0.7
+            );
+
+            enabled = true;
+            setButtonState(true);
+
+        } catch (error) {
+            console.error('Could not start Ghost Heist ambient sound:', error);
+            button.textContent = 'Sound unavailable';
+            button.setAttribute('aria-pressed', 'false');
+        } finally {
+            starting = false;
+        }
+    }
+
+    async function stopSound() {
+        if (audioContext && masterGain) {
+            masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+
+            masterGain.gain.setTargetAtTime(
+                0,
+                audioContext.currentTime,
+                0.12
+            );
+        }
+
+        enabled = false;
+        setButtonState(false);
+    }
+
+    button.addEventListener('click', async () => {
+        if (enabled) {
+            await stopSound();
+        } else {
+            await startSound();
+        }
+    });
+
+    /* Stop sound when the player leaves the tab. */
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && enabled) {
+            stopSound();
+        }
+    });
+})();
+</script>
+
 </body>
 </html>
