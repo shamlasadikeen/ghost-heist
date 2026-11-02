@@ -498,3 +498,20 @@ a {
         text-align: center;
     }
 }
+#interactButton {
+    display: none;
+    width: 100%;
+    margin-top: 10px;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #7354d6;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#interactButton:hover {
+    background: #6042bd;
+}

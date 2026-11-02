@@ -22,40 +22,38 @@ if (!isset($levels[$difficulty])) {
     $difficulty = 'beginner';
 }
 
+/*
+ * Three rooms for the redesigned Ghost Heist game.
+ */
 $rooms = [
     1 => [
-        'name' => 'The Forgotten Entrance',
-        'description' => 'The mansion doors creak open. Your nightmare begins here.',
-        'image' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=85'
+        'name' => 'The Living Room',
+        'description' => 'Explore the living room and discover the hidden object.',
+        'image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85'
     ],
     2 => [
-        'name' => 'The Whispering Hall',
-        'description' => 'Whispers follow you. Something moves behind the walls.',
-        'image' => 'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1000&q=85'
+        'name' => 'The Kitchen',
+        'description' => 'Search the kitchen carefully. Something is waiting to be discovered.',
+        'image' => 'https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1000&q=85'
     ],
     3 => [
-        'name' => 'The Shadow Library',
-        'description' => 'Forbidden books conceal the secrets of the dead.',
-        'image' => 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=1000&q=85'
-    ],
-    4 => [
-        'name' => 'The Ghost Chamber',
-        'description' => 'The shadows are alive. Do not trust what you see.',
-        'image' => 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1000&q=85'
-    ],
-    5 => [
-        'name' => 'The Treasure Vault',
-        'description' => 'The final door stands between you and the treasure.',
-        'image' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=85'
+        'name' => 'The Treasure Room',
+        'description' => 'Find the final hidden object and claim the treasure.',
+        'image' => 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=1000&q=85'
     ]
 ];
 
 try {
+    /*
+     * Read progress from the new three-room table.
+     * The old room_progress table remains untouched.
+     */
     $stmt = $pdo->prepare(
         'SELECT room_number
-         FROM room_progress
+         FROM room_progress_v2
          WHERE user_id = ? AND difficulty = ?'
     );
+
     $stmt->execute([$userId, $difficulty]);
 
     $completedRooms = array_values(array_unique(array_map(
@@ -63,17 +61,26 @@ try {
         $stmt->fetchAll(PDO::FETCH_COLUMN)
     )));
 
-    $stmt = $pdo->prepare('SELECT coins FROM users WHERE id = ?');
+    /*
+     * Keep the existing coin balance.
+     */
+    $stmt = $pdo->prepare(
+        'SELECT coins FROM users WHERE id = ?'
+    );
+
     $stmt->execute([$userId]);
     $coins = (int) $stmt->fetchColumn();
 
 } catch (PDOException $e) {
     error_log('Ghost Heist room map error: ' . $e->getMessage());
+
     http_response_code(500);
     exit('Could not load your mansion progress. Please try again.');
 }
 
-/* Unlock the first incomplete room only. */
+/*
+ * Unlock the first incomplete room only.
+ */
 $nextRoom = null;
 
 foreach (array_keys($rooms) as $roomNumber) {
@@ -101,8 +108,10 @@ $username = $_SESSION['username'] ?? 'Heister';
     <title>The Mansion | Ghost Heist</title>
 
     <link rel="stylesheet" href="../assets/css/style.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -166,13 +175,10 @@ $username = $_SESSION['username'] ?? 'Heister';
             animation: fogDrift 20s ease-in-out infinite alternate;
         }
 
-        button,
-        a {
+        button, a {
             font: inherit;
             -webkit-tap-highlight-color: transparent;
         }
-
-        /* Rain animation */
 
         .rain {
             position: fixed;
@@ -191,7 +197,7 @@ $username = $_SESSION['username'] ?? 'Heister';
             padding: 22px 0 35px;
         }
 
-        /* Navigation and branding */
+        /* Navigation */
 
         .topbar {
             display: flex;
@@ -203,10 +209,9 @@ $username = $_SESSION['username'] ?? 'Heister';
             border-bottom: 1px solid var(--border);
         }
 
-        /* Override conflicting styles from style.css */
         .topbar .brand,
         .topbar a.brand {
-            color: #ffffff !important;
+            color: #fff !important;
             font-family: 'Inter', sans-serif !important;
             font-size: 1rem !important;
             font-weight: 800 !important;
@@ -223,13 +228,7 @@ $username = $_SESSION['username'] ?? 'Heister';
                 0 0 22px rgba(229, 30, 53, .45) !important;
         }
 
-        .topbar .brand:hover,
-        .topbar a.brand:hover {
-            color: #ffffff !important;
-        }
-
-        .topbar .brand:hover span,
-        .topbar a.brand:hover span {
+        .topbar .brand:hover span {
             color: #ff6576 !important;
         }
 
@@ -270,7 +269,7 @@ $username = $_SESSION['username'] ?? 'Heister';
             outline-offset: 4px;
         }
 
-        /* Page heading */
+        /* Heading */
 
         .room-heading {
             margin: 25px 0 20px;
@@ -412,10 +411,13 @@ $username = $_SESSION['username'] ?? 'Heister';
                 box-shadow .25s;
         }
 
-        .room-card:nth-child(2) { animation-delay: .07s; }
-        .room-card:nth-child(3) { animation-delay: .14s; }
-        .room-card:nth-child(4) { animation-delay: .21s; }
-        .room-card:nth-child(5) { animation-delay: .28s; }
+        .room-card:nth-child(2) {
+            animation-delay: .07s;
+        }
+
+        .room-card:nth-child(3) {
+            animation-delay: .14s;
+        }
 
         .room-card.available:hover {
             transform: translateY(-5px);
@@ -661,23 +663,45 @@ $username = $_SESSION['username'] ?? 'Heister';
         /* Animations */
 
         @keyframes mansionReveal {
-            from { opacity: .5; transform: scale(1.08); }
-            to { opacity: 1; transform: scale(1.03); }
+            from {
+                opacity: .5;
+                transform: scale(1.08);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1.03);
+            }
         }
 
         @keyframes fogDrift {
-            from { transform: translate3d(-2%, 1%, 0) scale(1); }
-            to { transform: translate3d(3%, -2%, 0) scale(1.08); }
+            from {
+                transform: translate3d(-2%, 1%, 0) scale(1);
+            }
+            to {
+                transform: translate3d(3%, -2%, 0) scale(1.08);
+            }
         }
 
         @keyframes lightSweep {
-            0%, 100% { transform: translateY(-15px); opacity: .2; }
-            50% { transform: translateY(0); opacity: .9; }
+            0%, 100% {
+                transform: translateY(-15px);
+                opacity: .2;
+            }
+            50% {
+                transform: translateY(0);
+                opacity: .9;
+            }
         }
 
         @keyframes riseIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive layout */
@@ -767,16 +791,19 @@ $username = $_SESSION['username'] ?? 'Heister';
 </head>
 
 <body>
+
 <canvas class="rain" id="rainCanvas" aria-hidden="true"></canvas>
 
 <main class="map-shell">
 
     <nav class="topbar">
+
         <a class="brand" href="../index.php">
             <span>GHOST</span> HEIST
         </a>
 
         <div class="top-links">
+
             <button
                 class="sound-toggle"
                 id="soundToggle"
@@ -787,33 +814,42 @@ $username = $_SESSION['username'] ?? 'Heister';
             <a href="dashboard.php">&larr; Dashboard</a>
             <a href="leaderboard.php">Leaderboard</a>
             <a href="../logout.php">Exit ↗</a>
+
         </div>
+
     </nav>
 
     <header class="room-heading">
+
         <p class="eyebrow">Enter if you dare</p>
 
         <h1>Choose Your <span>Nightmare</span></h1>
 
         <div class="heading-bottom">
+
             <p class="heading-description">
-                Five cursed rooms. Complete each one to unlock the next.
+                Three mysterious rooms. Complete each one to unlock the next.
             </p>
 
             <div class="room-stats">
+
                 <div class="stat-pill">
                     <span class="gold">✦</span>
                     <?= number_format($coins) ?> coins
                 </div>
 
                 <div class="stat-pill">
-                    ☠ <?= $completedCount ?> / 5 rooms completed
+                    ☠ <?= $completedCount ?> / 3 rooms completed
                 </div>
+
             </div>
+
         </div>
+
     </header>
 
     <div class="directory-toolbar">
+
         <p>
             Welcome back,
             <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?>.
@@ -821,20 +857,34 @@ $username = $_SESSION['username'] ?? 'Heister';
         </p>
 
         <nav class="difficulty-switch" aria-label="Choose difficulty">
+
             <?php foreach ($levels as $key => $label): ?>
+
                 <a
                     href="rooms.php?difficulty=<?= urlencode($key) ?>"
                     class="<?= $difficulty === $key ? 'active' : '' ?>"
                     <?= $difficulty === $key ? 'aria-current="page"' : '' ?>
-                ><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></a>
+                >
+                    <?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?>
+                </a>
+
             <?php endforeach; ?>
+
         </nav>
+
     </div>
 
-    <section class="room-grid" aria-label="Five mansion rooms">
+    <section class="room-grid" aria-label="Three mansion rooms">
+
         <?php foreach ($rooms as $number => $roomData): ?>
+
             <?php
-                $isCompleted = in_array($number, $completedRooms, true);
+                $isCompleted = in_array(
+                    $number,
+                    $completedRooms,
+                    true
+                );
+
                 $isUnlocked = $isCompleted || $number === $nextRoom;
 
                 $cardClass = $isCompleted
@@ -845,10 +895,12 @@ $username = $_SESSION['username'] ?? 'Heister';
                     $status = 'Room cleared';
                     $icon = '✓';
                     $action = 'Treasure secured';
+
                 } elseif ($isUnlocked) {
                     $status = 'Door unlocked';
                     $icon = '↗';
                     $action = 'Enter Room';
+
                 } else {
                     $status = 'Access denied';
                     $icon = '🔒';
@@ -857,10 +909,12 @@ $username = $_SESSION['username'] ?? 'Heister';
             ?>
 
             <article class="room-card <?= $cardClass ?>">
+
                 <div
                     class="room-art"
                     style="--room-image: url('<?= htmlspecialchars($roomData['image'], ENT_QUOTES, 'UTF-8') ?>');"
                 >
+
                     <div class="image-overlay"></div>
 
                     <span class="room-index">
@@ -874,53 +928,89 @@ $username = $_SESSION['username'] ?? 'Heister';
                     ><?= $icon ?></span>
 
                     <div class="image-title">
-                        <span><?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?></span>
-                        <h2><?= htmlspecialchars($roomData['name'], ENT_QUOTES, 'UTF-8') ?></h2>
+
+                        <span>
+                            <?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>
+                        </span>
+
+                        <h2>
+                            <?= htmlspecialchars($roomData['name'], ENT_QUOTES, 'UTF-8') ?>
+                        </h2>
+
                     </div>
+
                 </div>
 
                 <div class="room-content">
-                    <p><?= htmlspecialchars($roomData['description'], ENT_QUOTES, 'UTF-8') ?></p>
+
+                    <p>
+                        <?= htmlspecialchars($roomData['description'], ENT_QUOTES, 'UTF-8') ?>
+                    </p>
 
                     <?php if ($isUnlocked && !$isCompleted): ?>
+
                         <a
                             class="room-action"
-                            href="game.php?difficulty=<?= urlencode($difficulty) ?>&room=<?= $number ?>"
-                        ><?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?> &rarr;</a>
+                            href="stealth.php?difficulty=<?= urlencode($difficulty) ?>&room=<?= $number ?>"
+                        >
+                            <?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>
+                            &rarr;
+                        </a>
 
                     <?php elseif ($isCompleted): ?>
-                        <div class="room-action">✓ Treasure secured</div>
+
+                        <div class="room-action">
+                            ✓ Treasure secured
+                        </div>
 
                     <?php else: ?>
+
                         <div class="room-action" aria-disabled="true">
                             🔒 <?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>
                         </div>
+
                     <?php endif; ?>
+
                 </div>
+
             </article>
+
         <?php endforeach; ?>
+
     </section>
 
     <div class="bottom-note">
+
         <?php if ($allCompleted): ?>
-            <strong>All five rooms conquered!</strong>
+
+            <strong>All three rooms conquered!</strong>
             You've completed this difficulty. The treasure is yours!
+
         <?php else: ?>
+
             <strong>Survival tip:</strong>
             Solve the current room to break its curse and unlock the next door.
+
         <?php endif; ?>
+
     </div>
 
     <footer class="footer">
+
         <span>GHOST HEIST &copy; <?= date('Y') ?></span>
+
         <span>Think fast. Stay brave. Fear nothing.</span>
+
     </footer>
 
 </main>
 
 <script>
+
 /* Atmospheric rain effect */
+
 (() => {
+
     const canvas = document.getElementById('rainCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -942,6 +1032,7 @@ $username = $_SESSION['username'] ?? 'Heister';
     let isPaused = false;
 
     function resizeCanvas() {
+
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
 
@@ -954,16 +1045,20 @@ $username = $_SESSION['username'] ?? 'Heister';
             speed: 5 + Math.random() * 8,
             opacity: 0.08 + Math.random() * 0.22
         }));
+
     }
 
     function drawRain() {
+
         if (isPaused) return;
 
         ctx.clearRect(0, 0, width, height);
         ctx.lineWidth = 1;
 
         drops.forEach(drop => {
+
             ctx.strokeStyle = `rgba(220, 205, 215, ${drop.opacity})`;
+
             ctx.beginPath();
             ctx.moveTo(drop.x, drop.y);
             ctx.lineTo(drop.x - 2, drop.y + drop.length);
@@ -980,63 +1075,77 @@ $username = $_SESSION['username'] ?? 'Heister';
             if (drop.x < 0) {
                 drop.x = width;
             }
+
         });
 
         animationFrame = requestAnimationFrame(drawRain);
+
     }
 
     function pauseRain() {
+
         isPaused = true;
 
         if (animationFrame !== null) {
             cancelAnimationFrame(animationFrame);
             animationFrame = null;
         }
+
     }
 
     function resumeRain() {
+
         if (!isPaused) return;
 
         isPaused = false;
         drawRain();
+
     }
 
     window.addEventListener('resize', resizeCanvas);
 
     document.addEventListener('visibilitychange', () => {
+
         if (document.hidden) {
             pauseRain();
         } else {
             resumeRain();
         }
+
     });
 
     resizeCanvas();
     drawRain();
+
 })();
+
 
 /*
  * Ambient horror sound.
  * Audio starts only after the user presses the sound button.
  */
+
 (() => {
+
     const button = document.getElementById('soundToggle');
 
     let audioContext = null;
     let masterGain = null;
     let enabled = false;
     let starting = false;
-    let oscillators = [];
 
     function setButtonState(isEnabled) {
+
         button.textContent = isEnabled
             ? '♫ Sound: On'
             : '♫ Sound: Off';
 
         button.setAttribute('aria-pressed', String(isEnabled));
+
     }
 
     async function startSound() {
+
         if (starting || enabled) return;
 
         starting = true;
@@ -1046,17 +1155,20 @@ $username = $_SESSION['username'] ?? 'Heister';
             window.AudioContext || window.webkitAudioContext;
 
         if (!AudioContextClass) {
+
             button.textContent = 'Sound not supported';
             starting = false;
             return;
+
         }
 
         try {
+
             if (!audioContext || audioContext.state === 'closed') {
+
                 audioContext = new AudioContextClass();
                 masterGain = audioContext.createGain();
 
-                /* Keep the sound at a moderate volume. */
                 masterGain.gain.value = 0;
                 masterGain.connect(audioContext.destination);
 
@@ -1067,6 +1179,7 @@ $username = $_SESSION['username'] ?? 'Heister';
                 ];
 
                 tones.forEach(tone => {
+
                     const oscillator = audioContext.createOscillator();
                     const gain = audioContext.createGain();
 
@@ -1076,10 +1189,11 @@ $username = $_SESSION['username'] ?? 'Heister';
 
                     oscillator.connect(gain);
                     gain.connect(masterGain);
+
                     oscillator.start();
 
-                    oscillators.push(oscillator);
                 });
+
             }
 
             await audioContext.resume();
@@ -1089,6 +1203,7 @@ $username = $_SESSION['username'] ?? 'Heister';
             }
 
             masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+
             masterGain.gain.setTargetAtTime(
                 0.22,
                 audioContext.currentTime,
@@ -1099,16 +1214,27 @@ $username = $_SESSION['username'] ?? 'Heister';
             setButtonState(true);
 
         } catch (error) {
-            console.error('Could not start Ghost Heist ambient sound:', error);
+
+            console.error(
+                'Could not start Ghost Heist ambient sound:',
+                error
+            );
+
             button.textContent = 'Sound unavailable';
             button.setAttribute('aria-pressed', 'false');
+
         } finally {
+
             starting = false;
+
         }
+
     }
 
     async function stopSound() {
+
         if (audioContext && masterGain) {
+
             masterGain.gain.cancelScheduledValues(audioContext.currentTime);
 
             masterGain.gain.setTargetAtTime(
@@ -1116,27 +1242,34 @@ $username = $_SESSION['username'] ?? 'Heister';
                 audioContext.currentTime,
                 0.12
             );
+
         }
 
         enabled = false;
         setButtonState(false);
+
     }
 
     button.addEventListener('click', async () => {
+
         if (enabled) {
             await stopSound();
         } else {
             await startSound();
         }
+
     });
 
-    /* Stop sound when the player leaves the tab. */
     document.addEventListener('visibilitychange', () => {
+
         if (document.hidden && enabled) {
             stopSound();
         }
+
     });
+
 })();
+
 </script>
 
 </body>

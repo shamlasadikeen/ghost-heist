@@ -1,0 +1,697 @@
+{
+  "name": "Top-Down Character Roster Lite",
+  "tile": 16,
+  "image": "topdown-roster-lite-sheet.png",
+  "size": {
+    "w": 128,
+    "h": 192
+  },
+  "frames": {
+    "knight_walk_down_0": {
+      "x": 0,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_down_1": {
+      "x": 16,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_down_2": {
+      "x": 32,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_down_3": {
+      "x": 48,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_up_0": {
+      "x": 64,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_up_1": {
+      "x": 80,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_up_2": {
+      "x": 96,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_up_3": {
+      "x": 112,
+      "y": 0,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_right_0": {
+      "x": 0,
+      "y": 16,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_right_1": {
+      "x": 16,
+      "y": 16,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_right_2": {
+      "x": 32,
+      "y": 16,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_right_3": {
+      "x": 48,
+      "y": 16,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_left_0": {
+      "x": 64,
+      "y": 16,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_left_1": {
+      "x": 80,
+      "y": 16,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_left_2": {
+      "x": 96,
+      "y": 16,
+      "w": 16,
+      "h": 16
+    },
+    "knight_walk_left_3": {
+      "x": 112,
+      "y": 16,
+      "w": 16,
+      "h": 16
+    },
+    "knight_idle_0": {
+      "x": 0,
+      "y": 32,
+      "w": 16,
+      "h": 16
+    },
+    "knight_idle_1": {
+      "x": 16,
+      "y": 32,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_down_0": {
+      "x": 32,
+      "y": 32,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_down_1": {
+      "x": 48,
+      "y": 32,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_down_2": {
+      "x": 64,
+      "y": 32,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_up_0": {
+      "x": 80,
+      "y": 32,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_up_1": {
+      "x": 96,
+      "y": 32,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_up_2": {
+      "x": 112,
+      "y": 32,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_right_0": {
+      "x": 0,
+      "y": 48,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_right_1": {
+      "x": 16,
+      "y": 48,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_right_2": {
+      "x": 32,
+      "y": 48,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_left_0": {
+      "x": 48,
+      "y": 48,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_left_1": {
+      "x": 64,
+      "y": 48,
+      "w": 16,
+      "h": 16
+    },
+    "knight_act_left_2": {
+      "x": 80,
+      "y": 48,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_down_0": {
+      "x": 96,
+      "y": 48,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_down_1": {
+      "x": 112,
+      "y": 48,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_down_2": {
+      "x": 0,
+      "y": 64,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_down_3": {
+      "x": 16,
+      "y": 64,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_up_0": {
+      "x": 32,
+      "y": 64,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_up_1": {
+      "x": 48,
+      "y": 64,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_up_2": {
+      "x": 64,
+      "y": 64,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_up_3": {
+      "x": 80,
+      "y": 64,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_right_0": {
+      "x": 96,
+      "y": 64,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_right_1": {
+      "x": 112,
+      "y": 64,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_right_2": {
+      "x": 0,
+      "y": 80,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_right_3": {
+      "x": 16,
+      "y": 80,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_left_0": {
+      "x": 32,
+      "y": 80,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_left_1": {
+      "x": 48,
+      "y": 80,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_left_2": {
+      "x": 64,
+      "y": 80,
+      "w": 16,
+      "h": 16
+    },
+    "mage_walk_left_3": {
+      "x": 80,
+      "y": 80,
+      "w": 16,
+      "h": 16
+    },
+    "mage_idle_0": {
+      "x": 96,
+      "y": 80,
+      "w": 16,
+      "h": 16
+    },
+    "mage_idle_1": {
+      "x": 112,
+      "y": 80,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_down_0": {
+      "x": 0,
+      "y": 96,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_down_1": {
+      "x": 16,
+      "y": 96,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_down_2": {
+      "x": 32,
+      "y": 96,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_up_0": {
+      "x": 48,
+      "y": 96,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_up_1": {
+      "x": 64,
+      "y": 96,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_up_2": {
+      "x": 80,
+      "y": 96,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_right_0": {
+      "x": 96,
+      "y": 96,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_right_1": {
+      "x": 112,
+      "y": 96,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_right_2": {
+      "x": 0,
+      "y": 112,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_left_0": {
+      "x": 16,
+      "y": 112,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_left_1": {
+      "x": 32,
+      "y": 112,
+      "w": 16,
+      "h": 16
+    },
+    "mage_act_left_2": {
+      "x": 48,
+      "y": 112,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_down_0": {
+      "x": 64,
+      "y": 112,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_down_1": {
+      "x": 80,
+      "y": 112,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_down_2": {
+      "x": 96,
+      "y": 112,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_down_3": {
+      "x": 112,
+      "y": 112,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_up_0": {
+      "x": 0,
+      "y": 128,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_up_1": {
+      "x": 16,
+      "y": 128,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_up_2": {
+      "x": 32,
+      "y": 128,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_up_3": {
+      "x": 48,
+      "y": 128,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_right_0": {
+      "x": 64,
+      "y": 128,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_right_1": {
+      "x": 80,
+      "y": 128,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_right_2": {
+      "x": 96,
+      "y": 128,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_right_3": {
+      "x": 112,
+      "y": 128,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_left_0": {
+      "x": 0,
+      "y": 144,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_left_1": {
+      "x": 16,
+      "y": 144,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_left_2": {
+      "x": 32,
+      "y": 144,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_walk_left_3": {
+      "x": 48,
+      "y": 144,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_idle_0": {
+      "x": 64,
+      "y": 144,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_idle_1": {
+      "x": 80,
+      "y": 144,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_down_0": {
+      "x": 96,
+      "y": 144,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_down_1": {
+      "x": 112,
+      "y": 144,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_down_2": {
+      "x": 0,
+      "y": 160,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_up_0": {
+      "x": 16,
+      "y": 160,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_up_1": {
+      "x": 32,
+      "y": 160,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_up_2": {
+      "x": 48,
+      "y": 160,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_right_0": {
+      "x": 64,
+      "y": 160,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_right_1": {
+      "x": 80,
+      "y": 160,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_right_2": {
+      "x": 96,
+      "y": 160,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_left_0": {
+      "x": 112,
+      "y": 160,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_left_1": {
+      "x": 0,
+      "y": 176,
+      "w": 16,
+      "h": 16
+    },
+    "rogue_act_left_2": {
+      "x": 16,
+      "y": 176,
+      "w": 16,
+      "h": 16
+    }
+  },
+  "animations": {
+    "knight_walk_down": [
+      "knight_walk_down_0",
+      "knight_walk_down_1",
+      "knight_walk_down_2",
+      "knight_walk_down_3"
+    ],
+    "knight_walk_up": [
+      "knight_walk_up_0",
+      "knight_walk_up_1",
+      "knight_walk_up_2",
+      "knight_walk_up_3"
+    ],
+    "knight_walk_right": [
+      "knight_walk_right_0",
+      "knight_walk_right_1",
+      "knight_walk_right_2",
+      "knight_walk_right_3"
+    ],
+    "knight_walk_left": [
+      "knight_walk_left_0",
+      "knight_walk_left_1",
+      "knight_walk_left_2",
+      "knight_walk_left_3"
+    ],
+    "knight_idle": [
+      "knight_idle_0",
+      "knight_idle_1"
+    ],
+    "knight_act_down": [
+      "knight_act_down_0",
+      "knight_act_down_1",
+      "knight_act_down_2"
+    ],
+    "knight_act_up": [
+      "knight_act_up_0",
+      "knight_act_up_1",
+      "knight_act_up_2"
+    ],
+    "knight_act_right": [
+      "knight_act_right_0",
+      "knight_act_right_1",
+      "knight_act_right_2"
+    ],
+    "knight_act_left": [
+      "knight_act_left_0",
+      "knight_act_left_1",
+      "knight_act_left_2"
+    ],
+    "mage_walk_down": [
+      "mage_walk_down_0",
+      "mage_walk_down_1",
+      "mage_walk_down_2",
+      "mage_walk_down_3"
+    ],
+    "mage_walk_up": [
+      "mage_walk_up_0",
+      "mage_walk_up_1",
+      "mage_walk_up_2",
+      "mage_walk_up_3"
+    ],
+    "mage_walk_right": [
+      "mage_walk_right_0",
+      "mage_walk_right_1",
+      "mage_walk_right_2",
+      "mage_walk_right_3"
+    ],
+    "mage_walk_left": [
+      "mage_walk_left_0",
+      "mage_walk_left_1",
+      "mage_walk_left_2",
+      "mage_walk_left_3"
+    ],
+    "mage_idle": [
+      "mage_idle_0",
+      "mage_idle_1"
+    ],
+    "mage_act_down": [
+      "mage_act_down_0",
+      "mage_act_down_1",
+      "mage_act_down_2"
+    ],
+    "mage_act_up": [
+      "mage_act_up_0",
+      "mage_act_up_1",
+      "mage_act_up_2"
+    ],
+    "mage_act_right": [
+      "mage_act_right_0",
+      "mage_act_right_1",
+      "mage_act_right_2"
+    ],
+    "mage_act_left": [
+      "mage_act_left_0",
+      "mage_act_left_1",
+      "mage_act_left_2"
+    ],
+    "rogue_walk_down": [
+      "rogue_walk_down_0",
+      "rogue_walk_down_1",
+      "rogue_walk_down_2",
+      "rogue_walk_down_3"
+    ],
+    "rogue_walk_up": [
+      "rogue_walk_up_0",
+      "rogue_walk_up_1",
+      "rogue_walk_up_2",
+      "rogue_walk_up_3"
+    ],
+    "rogue_walk_right": [
+      "rogue_walk_right_0",
+      "rogue_walk_right_1",
+      "rogue_walk_right_2",
+      "rogue_walk_right_3"
+    ],
+    "rogue_walk_left": [
+      "rogue_walk_left_0",
+      "rogue_walk_left_1",
+      "rogue_walk_left_2",
+      "rogue_walk_left_3"
+    ],
+    "rogue_idle": [
+      "rogue_idle_0",
+      "rogue_idle_1"
+    ],
+    "rogue_act_down": [
+      "rogue_act_down_0",
+      "rogue_act_down_1",
+      "rogue_act_down_2"
+    ],
+    "rogue_act_up": [
+      "rogue_act_up_0",
+      "rogue_act_up_1",
+      "rogue_act_up_2"
+    ],
+    "rogue_act_right": [
+      "rogue_act_right_0",
+      "rogue_act_right_1",
+      "rogue_act_right_2"
+    ],
+    "rogue_act_left": [
+      "rogue_act_left_0",
+      "rogue_act_left_1",
+      "rogue_act_left_2"
+    ]
+  }
+}

@@ -34,7 +34,7 @@ if (!in_array($difficulty, $validDifficulties, true)) {
     ]);
 }
 
-if ($room === false || $room < 1 || $room > 5) {
+if ($room === false || $room < 1 || $room > 3) {
     respond(400, [
         'success' => false,
         'message' => 'Invalid room number.'
@@ -46,29 +46,32 @@ require_once __DIR__ . '/../config.php';
 $userId = (int) $_SESSION['user_id'];
 
 try {
-    // Read saved progress for this player and difficulty.
+    // Get completed rooms for this player and difficulty.
     $stmt = $pdo->prepare(
         'SELECT room_number
          FROM room_progress
-         WHERE user_id = ? AND difficulty = ?'
+         WHERE user_id = ? AND difficulty = ?
+           AND room_number BETWEEN 1 AND 3'
     );
+
     $stmt->execute([$userId, $difficulty]);
+
     $completedRooms = array_map(
         'intval',
         $stmt->fetchAll(PDO::FETCH_COLUMN)
     );
 
-    // A completed room must be accessed from the room map,
-    // not replayed to earn its reward again.
+    // Do not allow replaying a completed room.
     if (in_array($room, $completedRooms, true)) {
         respond(409, [
             'success' => false,
-            'message' => 'You have already completed this room. Return to the mansion map.'
+            'message' => $room === 3
+                ? 'You have already opened the treasure chest!'
+                : 'You have already completed this room and collected its key.'
         ]);
     }
 
-    // Room 1 is open by default. Each later room requires
-    // completion of the previous room at this difficulty.
+    // Each room requires completion of the previous room.
     if ($room > 1 && !in_array($room - 1, $completedRooms, true)) {
         respond(403, [
             'success' => false,
@@ -76,6 +79,7 @@ try {
         ]);
     }
 
+    // Load a banana puzzle.
     $apiUrl = 'https://marcconrad.com/uob/banana/api.php?out=json';
 
     $context = stream_context_create([
@@ -104,7 +108,7 @@ try {
         throw new RuntimeException('Invalid puzzle response.');
     }
 
-    // Bind the answer to this player, difficulty, and room.
+    // Store the puzzle against the logged-in player and selected room.
     $_SESSION['ghost_heist_puzzle'] = [
         'question' => $puzzle['question'],
         'solution' => (int) $puzzle['solution'],
@@ -119,8 +123,10 @@ try {
         'question' => $puzzle['question'],
         'difficulty' => $difficulty,
         'room' => $room,
-        'totalRooms' => 5
+        'totalRooms' => 3,
+        'puzzleType' => $room === 3 ? 'final_treasure' : 'room_challenge'
     ]);
+
 } catch (Throwable $e) {
     error_log('Ghost Heist puzzle API error: ' . $e->getMessage());
 
