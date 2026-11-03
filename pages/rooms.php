@@ -23,30 +23,36 @@ if (!isset($levels[$difficulty])) {
 }
 
 /*
- * Three rooms for the redesigned Ghost Heist game.
+ * Three rooms for Ghost Heist.
+ * Room progression and database functionality are preserved.
  */
 $rooms = [
     1 => [
         'name' => 'The Living Room',
-        'description' => 'Explore the living room and discover the hidden object.',
-        'image' => 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=85'
+        'description' => 'Sneak around the living room, avoid Granny and discover the hidden object.',
+        'emoji' => '🛋️',
+        'tag' => 'THE FIRST MISSION',
+        'background' => 'living'
     ],
     2 => [
         'name' => 'The Kitchen',
-        'description' => 'Search the kitchen carefully. Something is waiting to be discovered.',
-        'image' => 'https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1000&q=85'
+        'description' => 'Watch out for the guard! Explore the kitchen and find your next key.',
+        'emoji' => '🍳',
+        'tag' => 'THE SECOND MISSION',
+        'background' => 'kitchen'
     ],
     3 => [
         'name' => 'The Treasure Room',
-        'description' => 'Find the final hidden object and claim the treasure.',
-        'image' => 'https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?auto=format&fit=crop&w=1000&q=85'
+        'description' => 'Your final challenge! Find the chest, solve the puzzle and grab the treasure.',
+        'emoji' => '💎',
+        'tag' => 'THE FINAL MISSION',
+        'background' => 'treasure'
     ]
 ];
 
 try {
     /*
-     * Read progress from the new three-room table.
-     * The old room_progress table remains untouched.
+     * Load completed rooms for the selected difficulty.
      */
     $stmt = $pdo->prepare(
         'SELECT room_number
@@ -62,24 +68,19 @@ try {
     )));
 
     /*
-     * Keep the existing coin balance.
+     * Preserve the existing coin balance.
      */
-    $stmt = $pdo->prepare(
-        'SELECT coins FROM users WHERE id = ?'
-    );
-
-    $stmt->execute([$userId]);
-    $coins = (int) $stmt->fetchColumn();
+   
 
 } catch (PDOException $e) {
     error_log('Ghost Heist room map error: ' . $e->getMessage());
 
     http_response_code(500);
-    exit('Could not load your mansion progress. Please try again.');
+    exit('Could not load your game progress. Please try again.');
 }
 
 /*
- * Unlock the first incomplete room only.
+ * Unlock only the first incomplete room.
  */
 $nextRoom = null;
 
@@ -97,32 +98,36 @@ $completedCount = count(array_intersect(
 
 $allCompleted = $completedCount === count($rooms);
 $username = $_SESSION['username'] ?? 'Heister';
+
+$progressPercentage = (int) round(
+    ($completedCount / count($rooms)) * 100
+);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080608">
+    <meta name="theme-color" content="#fff7e8">
 
-    <title>The Mansion | Ghost Heist</title>
-
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Choose Your Room | Ghost Heist</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --red: #e51e35;
-            --red-light: #ff4255;
-            --gold: #e8bc71;
-            --text: #f7f1f1;
-            --muted: #b7a9ae;
-            --panel: rgba(17, 12, 17, .92);
-            --border: rgba(255, 255, 255, .12);
+            --purple: #7046c8;
+            --purple-dark: #50309b;
+            --yellow: #ffca45;
+            --pink: #ff7896;
+            --blue: #72c8ed;
+            --green: #8bd99a;
+            --ink: #29213e;
+            --muted: #777187;
+            --cream: #fff7e8;
         }
 
         * {
@@ -134,67 +139,26 @@ $username = $_SESSION['username'] ?? 'Heister';
         }
 
         body {
-            position: relative;
-            isolation: isolate;
-            min-height: 100vh;
             margin: 0;
+            min-height: 100vh;
             overflow-x: hidden;
-            background: #080608;
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -3;
-            pointer-events: none;
             background:
-                linear-gradient(
-                    180deg,
-                    rgba(8, 5, 8, .76),
-                    rgba(8, 5, 8, .94)
-                ),
-                url("https://images.unsplash.com/photo-1657265514497-02611707af59?auto=format&fit=crop&fm=jpg&q=85&w=2400")
-                center / cover no-repeat;
-            transform: scale(1.03);
-            animation: mansionReveal 2s ease-out both;
+                radial-gradient(circle at 8% 12%, #ffe8b8 0 8%, transparent 8.2%),
+                radial-gradient(circle at 95% 70%, #e9dcff 0 10%, transparent 10.2%),
+                var(--cream);
+            color: var(--ink);
+            font-family: 'Nunito', sans-serif;
         }
 
-        body::after {
-            content: "";
-            position: fixed;
-            inset: -25%;
-            z-index: -2;
-            pointer-events: none;
-            background:
-                radial-gradient(ellipse at 20% 60%, #a30c281f, transparent 35%),
-                radial-gradient(ellipse at 80% 30%, #d7193517, transparent 35%);
-            filter: blur(35px);
-            animation: fogDrift 20s ease-in-out infinite alternate;
-        }
-
-        button, a {
+        a, button {
             font: inherit;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .rain {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: .25;
-        }
-
-        .map-shell {
-            position: relative;
-            width: min(1240px, 92%);
+        .page-shell {
+            width: min(1160px, 92%);
             margin: auto;
-            padding: 22px 0 35px;
+            padding: 20px 0 35px;
         }
 
         /* Navigation */
@@ -203,33 +167,23 @@ $username = $_SESSION['username'] ?? 'Heister';
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 18px;
+            gap: 15px;
             flex-wrap: wrap;
-            padding: 8px 0 20px;
-            border-bottom: 1px solid var(--border);
+            padding: 10px 0 20px;
+            border-bottom: 2px solid #29213e18;
         }
 
-        .topbar .brand,
-        .topbar a.brand {
-            color: #fff !important;
-            font-family: 'Inter', sans-serif !important;
-            font-size: 1rem !important;
-            font-weight: 800 !important;
-            letter-spacing: 3px !important;
-            text-decoration: none !important;
-            text-shadow: none !important;
+        .brand {
+            color: var(--purple);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 29px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            text-decoration: none;
         }
 
-        .topbar .brand span,
-        .topbar a.brand span {
-            color: #ff3048 !important;
-            text-shadow:
-                0 0 8px rgba(255, 48, 72, .7),
-                0 0 22px rgba(229, 30, 53, .45) !important;
-        }
-
-        .topbar .brand:hover span {
-            color: #ff6576 !important;
+        .brand span {
+            color: #ff8a45;
         }
 
         .top-links {
@@ -239,153 +193,234 @@ $username = $_SESSION['username'] ?? 'Heister';
             flex-wrap: wrap;
         }
 
-        .top-links a,
-        .sound-toggle {
-            padding: 8px 0;
-            border: 0;
-            background: transparent;
-            color: #ded3d7;
-            font-size: .82rem;
+        .top-links a {
+            color: var(--ink);
+            font-size: 13px;
+            font-weight: 900;
             text-decoration: none;
-            cursor: pointer;
             transition: color .2s;
         }
 
-        .top-links a:hover,
-        .sound-toggle:hover {
-            color: var(--red-light);
+        .top-links a:hover {
+            color: var(--purple);
         }
 
-        .sound-toggle {
-            padding: 9px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: #100b0de8;
+        .exit-link {
+            color: #e45c78 !important;
         }
 
-        .sound-toggle:focus-visible,
-        a:focus-visible {
-            outline: 2px solid var(--red-light);
-            outline-offset: 4px;
+        /* Page heading */
+
+        .welcome-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 25px;
+            margin: 35px 0 25px;
         }
 
-        /* Heading */
-
-        .room-heading {
-            margin: 25px 0 20px;
+        .heading-copy {
+            max-width: 650px;
         }
 
         .eyebrow {
-            display: inline-flex;
+            display: inline-block;
+            padding: 8px 14px;
+            border: 2px solid var(--ink);
+            border-radius: 30px;
+            background: var(--yellow);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            transform: rotate(-2deg);
+        }
+
+        .welcome-section h1 {
+            margin: 17px 0 8px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(38px, 5vw, 60px);
+            line-height: 1;
+            letter-spacing: -1.5px;
+        }
+
+        .welcome-section h1 span {
+            color: var(--purple);
+        }
+
+        .welcome-section p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.8;
+        }
+
+        .welcome-character {
+            display: grid;
+            place-items: center;
+            width: 145px;
+            height: 145px;
+            flex-shrink: 0;
+            border: 3px solid var(--ink);
+            border-radius: 35px;
+            background: #ffe39c;
+            box-shadow: 6px 7px 0 var(--ink);
+            font-size: 82px;
+            transform: rotate(4deg);
+            animation: characterBob 3s ease-in-out infinite;
+        }
+
+        /* Player information */
+
+        .player-bar {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 14px;
+            margin: 28px 0;
+        }
+
+        .player-stat {
+            display: flex;
             align-items: center;
-            gap: 9px;
-            margin: 0 0 8px;
-            color: var(--red-light);
-            font-size: .7rem;
-            font-weight: 800;
-            letter-spacing: 3px;
+            gap: 13px;
+            min-width: 0;
+            padding: 16px;
+            border: 2px solid var(--ink);
+            border-radius: 17px;
+            background: white;
+            box-shadow: 3px 4px 0 var(--ink);
+        }
+
+        .stat-icon {
+            display: grid;
+            place-items: center;
+            width: 43px;
+            height: 43px;
+            flex-shrink: 0;
+            border-radius: 13px;
+            background: #fff0be;
+            font-size: 23px;
+        }
+
+        .player-stat:nth-child(2) .stat-icon {
+            background: #e8ddff;
+        }
+
+        .player-stat:nth-child(3) .stat-icon {
+            background: #d8f4e0;
+        }
+
+        .stat-label {
+            display: block;
+            margin-bottom: 3px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .7px;
             text-transform: uppercase;
         }
 
-        .eyebrow::before {
-            content: "";
-            width: 23px;
-            height: 1px;
-            background: var(--red-light);
+        .stat-value {
+            display: block;
+            overflow: hidden;
+            color: var(--ink);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .room-heading h1 {
-            margin: 0;
-            font-family: 'Creepster', cursive;
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            font-weight: 400;
-            line-height: 1.05;
-            text-shadow: 0 0 28px #e51e3525;
+        /* Progress bar */
+
+        .progress-panel {
+            margin: 25px 0;
+            padding: 19px 22px;
+            border: 2px solid var(--ink);
+            border-radius: 17px;
+            background: #fff;
+            box-shadow: 3px 4px 0 var(--ink);
         }
 
-        .room-heading h1 span {
-            color: var(--red-light);
-        }
-
-        .heading-bottom {
+        .progress-top {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 14px;
-            flex-wrap: wrap;
-            margin-top: 12px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
-        .heading-description {
-            margin: 0;
-            color: var(--muted);
-            font-size: .84rem;
-            line-height: 1.7;
+        .progress-top strong {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 17px;
         }
 
-        .room-stats {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+        .progress-number {
+            color: var(--purple);
+            font-size: 13px;
+            font-weight: 900;
         }
 
-        .stat-pill {
-            padding: 9px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: #100b0de8;
-            color: #e7dce0;
-            font-size: .76rem;
+        .progress-track {
+            height: 13px;
+            overflow: hidden;
+            border: 2px solid var(--ink);
+            border-radius: 20px;
+            background: #eee9f4;
         }
 
-        .stat-pill .gold {
-            color: var(--gold);
+        .progress-fill {
+            height: 100%;
+            width: <?= $progressPercentage ?>%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #8bd99a, #55c982);
+            transition: width .5s ease;
         }
 
-        /* Difficulty selection */
+        /* Difficulty selector */
 
-        .directory-toolbar {
+        .room-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 15px;
             flex-wrap: wrap;
-            margin: 23px 0 17px;
+            margin: 35px 0 20px;
         }
 
-        .directory-toolbar p {
+        .room-toolbar h2 {
             margin: 0;
-            color: var(--muted);
-            font-size: .8rem;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 26px;
         }
 
         .difficulty-switch {
             display: flex;
-            gap: 4px;
-            padding: 4px;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            background: #0d090ce8;
+            gap: 5px;
+            padding: 5px;
+            border: 2px solid var(--ink);
+            border-radius: 13px;
+            background: white;
+            box-shadow: 3px 3px 0 var(--ink);
         }
 
         .difficulty-switch a {
-            padding: 9px 12px;
-            border-radius: 6px;
-            color: #c5b8bd;
-            font-size: .76rem;
+            padding: 9px 13px;
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 900;
             text-decoration: none;
-            transition: background .2s, color .2s;
+            transition: .2s;
         }
 
         .difficulty-switch a:hover {
-            color: white;
+            color: var(--purple);
+            background: #f0e9ff;
         }
 
         .difficulty-switch a.active {
-            background: var(--red);
+            background: var(--purple);
             color: white;
-            font-weight: 800;
-            box-shadow: 0 0 18px #e51e352d;
         }
 
         /* Room cards */
@@ -393,307 +428,279 @@ $username = $_SESSION['username'] ?? 'Heister';
         .room-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 18px;
+            gap: 20px;
         }
 
         .room-card {
-            position: relative;
             min-width: 0;
             overflow: hidden;
-            border: 1px solid #ffffff1c;
-            border-radius: 12px;
-            background: var(--panel);
-            box-shadow: 0 12px 35px #0006;
-            animation: riseIn .65s ease-out both;
-            transition:
-                transform .25s,
-                border-color .25s,
-                box-shadow .25s;
+            border: 3px solid var(--ink);
+            border-radius: 21px;
+            background: white;
+            box-shadow: 5px 6px 0 var(--ink);
+            transition: transform .25s, box-shadow .25s;
+            animation: cardAppear .55s ease both;
         }
 
         .room-card:nth-child(2) {
-            animation-delay: .07s;
+            animation-delay: .08s;
         }
 
         .room-card:nth-child(3) {
-            animation-delay: .14s;
+            animation-delay: .16s;
         }
 
         .room-card.available:hover {
-            transform: translateY(-5px);
-            border-color: #ff425599;
-            box-shadow: 0 18px 42px #000a, 0 0 24px #e51e351c;
+            transform: translateY(-6px);
+            box-shadow: 7px 12px 0 var(--ink);
         }
 
         .room-card.completed {
-            border-color: #e8bc7155;
+            border-color: #378f58;
+            box-shadow: 5px 6px 0 #378f58;
         }
 
         .room-art {
             position: relative;
-            isolation: isolate;
-            min-height: 250px;
+            display: grid;
+            place-items: center;
+            height: 220px;
             overflow: hidden;
-            background: #160b10;
+        }
+
+        .room-art.living {
+            background: #bdeaff;
+        }
+
+        .room-art.kitchen {
+            background: #ffd5a1;
+        }
+
+        .room-art.treasure {
+            background: #e3d2ff;
         }
 
         .room-art::before {
             content: "";
             position: absolute;
-            inset: -5px;
-            z-index: -2;
-            background-image: var(--room-image);
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            filter: blur(2px) brightness(.65);
-            transform: scale(1.03);
-            transition: filter .35s ease, transform .6s ease;
-        }
-
-        .room-card.available:hover .room-art::before {
-            filter: blur(0) brightness(.82);
-            transform: scale(1.08);
-        }
-
-        .image-overlay {
-            position: absolute;
             inset: 0;
-            z-index: -1;
-            background:
-                linear-gradient(
-                    180deg,
-                    rgba(8, 5, 8, .3),
-                    rgba(8, 5, 8, .08) 35%,
-                    rgba(8, 5, 8, .82) 75%,
-                    rgba(8, 5, 8, .98)
-                ),
-                linear-gradient(
-                    100deg,
-                    rgba(40, 0, 8, .25),
-                    transparent 60%,
-                    rgba(0, 0, 0, .25)
-                );
+            opacity: .25;
+            background-image: radial-gradient(#29213e 1px, transparent 1px);
+            background-size: 17px 17px;
         }
 
-        .room-art::after {
+        .room-art.living::after,
+        .room-art.kitchen::after,
+        .room-art.treasure::after {
+            position: absolute;
+            right: -20px;
+            bottom: -35px;
+            width: 150px;
+            height: 150px;
+            border: 3px solid #29213e;
+            border-radius: 50%;
+            background: #ffffff30;
             content: "";
-            position: absolute;
-            right: -25%;
-            bottom: 0;
-            left: -25%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ff4255b0, transparent);
-            box-shadow: 0 0 18px #e51e3550;
-            animation: lightSweep 5s ease-in-out infinite;
         }
 
-        .room-index {
+        .room-emoji {
+            position: relative;
+            z-index: 1;
+            font-size: 103px;
+            filter: drop-shadow(4px 5px 0 #29213e25);
+            transition: transform .3s;
+        }
+
+        .room-card.available:hover .room-emoji {
+            transform: scale(1.12) rotate(-5deg);
+        }
+
+        .room-number {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 14px;
+            left: 14px;
             z-index: 2;
-            padding: 7px 9px;
-            border: 1px solid #ffffff30;
-            border-radius: 5px;
-            background: #080608d9;
-            color: #fff;
-            font-size: .64rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            backdrop-filter: blur(8px);
+            padding: 7px 11px;
+            border: 2px solid var(--ink);
+            border-radius: 20px;
+            background: white;
+            color: var(--ink);
+            font-size: 10px;
+            font-weight: 900;
         }
 
-        .status-icon {
+        .status-label {
             position: absolute;
             top: 13px;
             right: 13px;
             z-index: 2;
-            display: grid;
-            width: 36px;
-            height: 36px;
-            place-items: center;
-            border: 1px solid #ffffff3b;
-            border-radius: 50%;
-            background: #080608e8;
-            color: var(--red-light);
-            font-size: 1rem;
-            backdrop-filter: blur(8px);
+            padding: 7px 10px;
+            border: 2px solid var(--ink);
+            border-radius: 20px;
+            background: white;
+            color: var(--purple);
+            font-size: 10px;
+            font-weight: 900;
         }
 
-        .room-card.locked .room-art::before {
-            filter: blur(3px) brightness(.35) saturate(.5);
+        .room-card.completed .status-label {
+            background: #d9f5df;
+            color: #267341;
         }
 
-        .room-card.locked .image-overlay {
-            background: linear-gradient(
-                180deg,
-                rgba(0, 0, 0, .48),
-                rgba(8, 5, 8, .55) 35%,
-                rgba(8, 5, 8, .98)
-            );
+        .room-card.locked .room-art {
+            filter: saturate(.55);
         }
 
-        .room-card.locked .status-icon {
-            color: #e5dce0;
-            border-color: #ffffff40;
+        .room-card.locked .room-emoji {
+            opacity: .45;
+            filter: grayscale(.65);
         }
 
-        .room-card.completed .status-icon {
-            color: var(--gold);
-            border-color: #e8bc7180;
+        .room-card.locked .status-label {
+            background: #eeeaf3;
+            color: #777187;
         }
-
-        .image-title {
-            position: absolute;
-            right: 18px;
-            bottom: 17px;
-            left: 18px;
-            z-index: 2;
-        }
-
-        .image-title span {
-            display: block;
-            margin-bottom: 7px;
-            color: var(--red-light);
-            font-size: .62rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .room-card.locked .image-title span {
-            color: #bcb0b5;
-        }
-
-        .room-card.completed .image-title span {
-            color: var(--gold);
-        }
-
-        .image-title h2 {
-            margin: 0;
-            font-family: 'Creepster', cursive;
-            font-size: clamp(1.65rem, 2.5vw, 2.1rem);
-            font-weight: 400;
-            line-height: 1.15;
-            text-shadow: 0 3px 15px #000;
-        }
-
-        /* Room actions */
 
         .room-content {
-            padding: 14px 17px 17px;
-            border-top: 1px solid #ffffff12;
+            padding: 19px;
+        }
+
+        .room-tag {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--purple);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .room-card.completed .room-tag {
+            color: #378f58;
+        }
+
+        .room-content h3 {
+            margin: 0 0 9px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 23px;
+            line-height: 1.2;
         }
 
         .room-content p {
-            min-height: 42px;
-            margin: 0 0 13px;
+            min-height: 66px;
+            margin: 0 0 17px;
             color: var(--muted);
-            font-size: .77rem;
-            line-height: 1.7;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.8;
         }
 
         .room-action {
             display: block;
             width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #ff42556b;
-            border-radius: 7px;
-            background: linear-gradient(100deg, #b6112b, #e51e35);
-            color: #fff;
-            font-size: .78rem;
-            font-weight: 800;
+            padding: 12px;
+            border: 2px solid var(--ink);
+            border-radius: 11px;
+            background: var(--purple);
+            color: white;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
             text-align: center;
             text-decoration: none;
-            transition: background .2s, box-shadow .2s, transform .2s;
+            box-shadow: 0 4px 0 var(--ink);
+            transition: .2s;
         }
 
         a.room-action:hover {
-            background: linear-gradient(100deg, #d51734, #ff4255);
-            box-shadow: 0 0 20px #e51e3530;
-            transform: translateY(-1px);
+            background: var(--purple-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--ink);
         }
 
         .room-card.completed .room-action {
-            border-color: #e8bc7140;
-            background: #e8bc7110;
-            color: var(--gold);
+            border-color: #378f58;
+            background: #e0f7e5;
+            color: #267341;
+            box-shadow: 0 4px 0 #378f58;
         }
 
         .room-card.locked .room-action {
-            border-color: #ffffff12;
-            background: #ffffff06;
-            color: #a49aa0;
+            border-color: #d8d2e1;
+            background: #eeeaf3;
+            color: #888194;
+            box-shadow: none;
             cursor: not-allowed;
         }
 
+        /* Bottom message */
+
         .bottom-note {
-            margin-top: 22px;
-            padding: 15px 18px;
-            border: 1px solid #ffffff17;
-            border-radius: 9px;
-            background: #100b0de8;
-            color: var(--muted);
-            font-size: .8rem;
-            line-height: 1.7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 30px;
+            padding: 18px;
+            border: 2px solid var(--ink);
+            border-radius: 15px;
+            background: #fff0bd;
             text-align: center;
+            box-shadow: 3px 4px 0 var(--ink);
+        }
+
+        .bottom-note .note-icon {
+            font-size: 28px;
+        }
+
+        .bottom-note p {
+            margin: 0;
+            color: var(--ink);
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.7;
         }
 
         .bottom-note strong {
-            color: var(--gold);
+            color: var(--purple);
         }
+
+        /* Footer */
 
         .footer {
             display: flex;
             justify-content: space-between;
             gap: 12px;
             flex-wrap: wrap;
-            margin-top: 24px;
-            padding-top: 17px;
-            border-top: 1px solid #ffffff17;
-            color: #95868d;
-            font-size: .72rem;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 2px solid #29213e18;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
         }
 
-        .footer span:last-child {
-            color: #c7a2a9;
+        .footer a {
+            color: var(--purple);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #ff7896;
         }
 
         /* Animations */
 
-        @keyframes mansionReveal {
-            from {
-                opacity: .5;
-                transform: scale(1.08);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1.03);
-            }
-        }
-
-        @keyframes fogDrift {
-            from {
-                transform: translate3d(-2%, 1%, 0) scale(1);
-            }
-            to {
-                transform: translate3d(3%, -2%, 0) scale(1.08);
-            }
-        }
-
-        @keyframes lightSweep {
+        @keyframes characterBob {
             0%, 100% {
-                transform: translateY(-15px);
-                opacity: .2;
+                transform: translateY(0) rotate(4deg);
             }
             50% {
-                transform: translateY(0);
-                opacity: .9;
+                transform: translateY(-8px) rotate(1deg);
             }
         }
 
-        @keyframes riseIn {
+        @keyframes cardAppear {
             from {
                 opacity: 0;
                 transform: translateY(15px);
@@ -704,47 +711,69 @@ $username = $_SESSION['username'] ?? 'Heister';
             }
         }
 
-        /* Responsive layout */
+        /* Responsive */
 
-        @media (max-width: 900px) {
+        @media (max-width: 850px) {
             .room-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .room-art {
-                min-height: 230px;
+            .welcome-character {
+                width: 115px;
+                height: 115px;
+                font-size: 65px;
             }
         }
 
-        @media (max-width: 580px) {
-            .map-shell {
+        @media (max-width: 600px) {
+            .page-shell {
                 width: 92%;
-                padding-top: 15px;
+                padding-top: 14px;
             }
 
             .topbar {
                 align-items: flex-start;
             }
 
+            .brand {
+                font-size: 25px;
+            }
+
             .top-links {
                 gap: 12px;
             }
 
-            .top-links a,
-            .sound-toggle {
-                font-size: .74rem;
+            .top-links a {
+                font-size: 11px;
             }
 
-            .room-heading {
-                margin-top: 22px;
+            .welcome-section {
+                align-items: flex-start;
+                margin-top: 28px;
             }
 
-            .room-heading h1 {
-                font-size: clamp(2.5rem, 12vw, 3.5rem);
+            .welcome-section h1 {
+                font-size: 40px;
             }
 
-            .heading-bottom,
-            .directory-toolbar {
+            .welcome-character {
+                width: 75px;
+                height: 75px;
+                border-radius: 20px;
+                font-size: 43px;
+                box-shadow: 4px 4px 0 var(--ink);
+            }
+
+            .player-bar {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .player-stat {
+                padding: 12px;
+            }
+
+            .room-toolbar {
                 align-items: flex-start;
                 flex-direction: column;
             }
@@ -761,19 +790,24 @@ $username = $_SESSION['username'] ?? 'Heister';
 
             .room-grid {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 19px;
             }
 
             .room-art {
-                min-height: 250px;
-            }
-
-            .image-title h2 {
-                font-size: 2rem;
+                height: 205px;
             }
 
             .room-content p {
                 min-height: 0;
+            }
+
+            .bottom-note {
+                align-items: flex-start;
+                text-align: left;
+            }
+
+            .footer {
+                flex-direction: column;
             }
         }
 
@@ -792,485 +826,265 @@ $username = $_SESSION['username'] ?? 'Heister';
 
 <body>
 
-<canvas class="rain" id="rainCanvas" aria-hidden="true"></canvas>
-
-<main class="map-shell">
+<main class="page-shell">
 
     <nav class="topbar">
 
         <a class="brand" href="../index.php">
-            <span>GHOST</span> HEIST
+            GHOST <span>HEIST</span>
         </a>
 
         <div class="top-links">
-
-            <button
-                class="sound-toggle"
-                id="soundToggle"
-                type="button"
-                aria-pressed="false"
-            >♫ Sound: Off</button>
-
-            <a href="dashboard.php">&larr; Dashboard</a>
-            <a href="leaderboard.php">Leaderboard</a>
-            <a href="../logout.php">Exit ↗</a>
-
+            <a href="dashboard.php">← Dashboard</a>
+            <a href="leaderboard.php">🏆 Leaderboard</a>
+            <a class="exit-link" href="../logout.php">Exit Game</a>
         </div>
 
     </nav>
 
-    <header class="room-heading">
+    <header class="welcome-section">
 
-        <p class="eyebrow">Enter if you dare</p>
+        <div class="heading-copy">
 
-        <h1>Choose Your <span>Nightmare</span></h1>
+            <span class="eyebrow">🎮 YOUR NEXT ADVENTURE</span>
 
-        <div class="heading-bottom">
+            <h1>
+                Choose Your
+                <span>Mission!</span>
+            </h1>
 
-            <p class="heading-description">
-                Three mysterious rooms. Complete each one to unlock the next.
+            <p>
+                Welcome back,
+                <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?>!
+                Three rooms, three challenges and one big treasure.
+                Are you ready?
             </p>
 
-            <div class="room-stats">
+        </div>
 
-                <div class="stat-pill">
-                    <span class="gold">✦</span>
-                    <?= number_format($coins) ?> coins
-                </div>
-
-                <div class="stat-pill">
-                    ☠ <?= $completedCount ?> / 3 rooms completed
-                </div>
-
-            </div>
-
+        <div class="welcome-character" aria-hidden="true">
+            🥷
         </div>
 
     </header>
 
-    <div class="directory-toolbar">
+    <section class="player-bar" aria-label="Player information">
 
-        <p>
-            Welcome back,
-            <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?>.
-            The mansion remembers you.
-        </p>
+        <div class="player-stat">
+            <div class="stat-icon">👤</div>
+            <div>
+                <span class="stat-label">Player</span>
+                <span class="stat-value">
+                    <?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?>
+                </span>
+            </div>
+        </div>
 
-        <nav class="difficulty-switch" aria-label="Choose difficulty">
+        <div class="player-stat">
+            <div class="stat-icon">🪙</div>
+            <div>
+                <span class="stat-label">Your Keys</span>
+                <span class="stat-value">
+                    <?= number_format($completedCount) ?>
+                </span>
+            </div>
+        </div>
 
-            <?php foreach ($levels as $key => $label): ?>
+        <div class="player-stat">
+            <div class="stat-icon">🏅</div>
+            <div>
+                <span class="stat-label">Rooms Completed</span>
+                <span class="stat-value">
+                    <?= $completedCount ?> / 3
+                </span>
+            </div>
+        </div>
 
-                <a
-                    href="rooms.php?difficulty=<?= urlencode($key) ?>"
-                    class="<?= $difficulty === $key ? 'active' : '' ?>"
-                    <?= $difficulty === $key ? 'aria-current="page"' : '' ?>
-                >
-                    <?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?>
-                </a>
+    </section>
 
-            <?php endforeach; ?>
+    <section class="progress-panel">
 
-        </nav>
+        <div class="progress-top">
+            <strong>🏆 Your Mission Progress</strong>
+            <span class="progress-number">
+                <?= $progressPercentage ?>%
+            </span>
+        </div>
 
-    </div>
+        <div
+            class="progress-track"
+            role="progressbar"
+            aria-label="Mission progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="<?= $progressPercentage ?>"
+        >
+            <div class="progress-fill"></div>
+        </div>
 
-    <section class="room-grid" aria-label="Three mansion rooms">
+    </section>
 
-        <?php foreach ($rooms as $number => $roomData): ?>
+    <section>
 
-            <?php
-                $isCompleted = in_array(
-                    $number,
-                    $completedRooms,
-                    true
-                );
+        <div class="room-toolbar">
 
-                $isUnlocked = $isCompleted || $number === $nextRoom;
+            <h2>🗺️ Explore the Rooms</h2>
 
-                $cardClass = $isCompleted
-                    ? 'completed'
-                    : ($isUnlocked ? 'available' : 'locked');
+            <nav class="difficulty-switch" aria-label="Choose difficulty">
 
-                if ($isCompleted) {
-                    $status = 'Room cleared';
-                    $icon = '✓';
-                    $action = 'Treasure secured';
+                <?php foreach ($levels as $key => $label): ?>
 
-                } elseif ($isUnlocked) {
-                    $status = 'Door unlocked';
-                    $icon = '↗';
-                    $action = 'Enter Room';
+                    <a
+                        href="rooms.php?difficulty=<?= urlencode($key) ?>"
+                        class="<?= $difficulty === $key ? 'active' : '' ?>"
+                        <?= $difficulty === $key ? 'aria-current="page"' : '' ?>
+                    >
+                        <?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?>
+                    </a>
 
-                } else {
-                    $status = 'Access denied';
-                    $icon = '🔒';
-                    $action = 'Complete Previous Room';
-                }
-            ?>
+                <?php endforeach; ?>
 
-            <article class="room-card <?= $cardClass ?>">
+            </nav>
 
-                <div
-                    class="room-art"
-                    style="--room-image: url('<?= htmlspecialchars($roomData['image'], ENT_QUOTES, 'UTF-8') ?>');"
-                >
+        </div>
 
-                    <div class="image-overlay"></div>
+        <div class="room-grid" aria-label="Three game rooms">
 
-                    <span class="room-index">
-                        ROOM <?= str_pad((string) $number, 2, '0', STR_PAD_LEFT) ?>
-                    </span>
+            <?php foreach ($rooms as $number => $roomData): ?>
 
-                    <span
-                        class="status-icon"
-                        aria-label="<?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>"
-                        title="<?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>"
-                    ><?= $icon ?></span>
+                <?php
+                    $isCompleted = in_array(
+                        $number,
+                        $completedRooms,
+                        true
+                    );
 
-                    <div class="image-title">
+                    $isUnlocked = $isCompleted || $number === $nextRoom;
 
-                        <span>
+                    $cardClass = $isCompleted
+                        ? 'completed'
+                        : ($isUnlocked ? 'available' : 'locked');
+
+                    if ($isCompleted) {
+                        $status = 'Completed ✓';
+                        $action = '✓ Mission Completed';
+
+                    } elseif ($isUnlocked) {
+                        $status = 'Ready to Play!';
+                        $action = 'Enter This Room →';
+
+                    } else {
+                        $status = 'Locked 🔒';
+                        $action = 'Complete Previous Room';
+                    }
+                ?>
+
+                <article class="room-card <?= $cardClass ?>">
+
+                    <div class="room-art <?= htmlspecialchars($roomData['background'], ENT_QUOTES, 'UTF-8') ?>">
+
+                        <span class="room-number">
+                            ROOM <?= str_pad((string) $number, 2, '0', STR_PAD_LEFT) ?>
+                        </span>
+
+                        <span class="status-label">
                             <?= htmlspecialchars($status, ENT_QUOTES, 'UTF-8') ?>
                         </span>
 
-                        <h2>
-                            <?= htmlspecialchars($roomData['name'], ENT_QUOTES, 'UTF-8') ?>
-                        </h2>
+                        <div class="room-emoji" aria-hidden="true">
+                            <?= $roomData['emoji'] ?>
+                        </div>
 
                     </div>
 
-                </div>
+                    <div class="room-content">
 
-                <div class="room-content">
+                        <span class="room-tag">
+                            <?= htmlspecialchars($roomData['tag'], ENT_QUOTES, 'UTF-8') ?>
+                        </span>
 
-                    <p>
-                        <?= htmlspecialchars($roomData['description'], ENT_QUOTES, 'UTF-8') ?>
-                    </p>
+                        <h3>
+                            <?= htmlspecialchars($roomData['name'], ENT_QUOTES, 'UTF-8') ?>
+                        </h3>
 
-                    <?php if ($isUnlocked && !$isCompleted): ?>
+                        <p>
+                            <?= htmlspecialchars($roomData['description'], ENT_QUOTES, 'UTF-8') ?>
+                        </p>
 
-                        <a
-                            class="room-action"
-                            href="stealth.php?difficulty=<?= urlencode($difficulty) ?>&room=<?= $number ?>"
-                        >
-                            <?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>
-                            &rarr;
-                        </a>
+                        <?php if ($isUnlocked && !$isCompleted): ?>
 
-                    <?php elseif ($isCompleted): ?>
+                            <a
+                                class="room-action"
+                                href="stealth.php?difficulty=<?= urlencode($difficulty) ?>&room=<?= $number ?>"
+                            >
+                                <?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>
+                            </a>
 
-                        <div class="room-action">
-                            ✓ Treasure secured
-                        </div>
+                        <?php elseif ($isCompleted): ?>
 
-                    <?php else: ?>
+                            <div class="room-action">
+                                ✓ Mission Completed
+                            </div>
 
-                        <div class="room-action" aria-disabled="true">
-                            🔒 <?= htmlspecialchars($action, ENT_QUOTES, 'UTF-8') ?>
-                        </div>
+                        <?php else: ?>
 
-                    <?php endif; ?>
+                            <div class="room-action" aria-disabled="true">
+                                🔒 Complete Previous Room
+                            </div>
 
-                </div>
+                        <?php endif; ?>
 
-            </article>
+                    </div>
 
-        <?php endforeach; ?>
+                </article>
+
+            <?php endforeach; ?>
+
+        </div>
 
     </section>
 
     <div class="bottom-note">
 
-        <?php if ($allCompleted): ?>
+        <span class="note-icon" aria-hidden="true">
+            <?php if ($allCompleted): ?>
+                🏆
+            <?php else: ?>
+                💡
+            <?php endif; ?>
+        </span>
 
-            <strong>All three rooms conquered!</strong>
-            You've completed this difficulty. The treasure is yours!
+        <p>
 
-        <?php else: ?>
+            <?php if ($allCompleted): ?>
 
-            <strong>Survival tip:</strong>
-            Solve the current room to break its curse and unlock the next door.
+                <strong>Fantastic! All three rooms completed!</strong>
+                You've conquered this difficulty and collected the treasure.
 
-        <?php endif; ?>
+            <?php else: ?>
+
+                <strong>Mission tip:</strong>
+                Complete your current room to unlock the next one.
+                Watch out for the guards!
+
+            <?php endif; ?>
+
+        </p>
 
     </div>
 
     <footer class="footer">
 
-        <span>GHOST HEIST &copy; <?= date('Y') ?></span>
+        <span>GHOST HEIST © <?= date('Y') ?></span>
 
-        <span>Think fast. Stay brave. Fear nothing.</span>
+        <span>
+            <a href="../index.php">Home</a>
+            · Think fast. Stay sneaky. Get the treasure! 💰
+        </span>
 
     </footer>
 
 </main>
-
-<script>
-
-/* Atmospheric rain effect */
-
-(() => {
-
-    const canvas = document.getElementById('rainCanvas');
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) return;
-
-    const reduceMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)'
-    ).matches;
-
-    if (reduceMotion) {
-        canvas.hidden = true;
-        return;
-    }
-
-    let drops = [];
-    let width = 0;
-    let height = 0;
-    let animationFrame = null;
-    let isPaused = false;
-
-    function resizeCanvas() {
-
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-
-        const count = Math.min(150, Math.floor(width / 8));
-
-        drops = Array.from({ length: count }, () => ({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            length: 8 + Math.random() * 18,
-            speed: 5 + Math.random() * 8,
-            opacity: 0.08 + Math.random() * 0.22
-        }));
-
-    }
-
-    function drawRain() {
-
-        if (isPaused) return;
-
-        ctx.clearRect(0, 0, width, height);
-        ctx.lineWidth = 1;
-
-        drops.forEach(drop => {
-
-            ctx.strokeStyle = `rgba(220, 205, 215, ${drop.opacity})`;
-
-            ctx.beginPath();
-            ctx.moveTo(drop.x, drop.y);
-            ctx.lineTo(drop.x - 2, drop.y + drop.length);
-            ctx.stroke();
-
-            drop.y += drop.speed;
-            drop.x -= 0.7;
-
-            if (drop.y > height) {
-                drop.y = -drop.length;
-                drop.x = Math.random() * width;
-            }
-
-            if (drop.x < 0) {
-                drop.x = width;
-            }
-
-        });
-
-        animationFrame = requestAnimationFrame(drawRain);
-
-    }
-
-    function pauseRain() {
-
-        isPaused = true;
-
-        if (animationFrame !== null) {
-            cancelAnimationFrame(animationFrame);
-            animationFrame = null;
-        }
-
-    }
-
-    function resumeRain() {
-
-        if (!isPaused) return;
-
-        isPaused = false;
-        drawRain();
-
-    }
-
-    window.addEventListener('resize', resizeCanvas);
-
-    document.addEventListener('visibilitychange', () => {
-
-        if (document.hidden) {
-            pauseRain();
-        } else {
-            resumeRain();
-        }
-
-    });
-
-    resizeCanvas();
-    drawRain();
-
-})();
-
-
-/*
- * Ambient horror sound.
- * Audio starts only after the user presses the sound button.
- */
-
-(() => {
-
-    const button = document.getElementById('soundToggle');
-
-    let audioContext = null;
-    let masterGain = null;
-    let enabled = false;
-    let starting = false;
-
-    function setButtonState(isEnabled) {
-
-        button.textContent = isEnabled
-            ? '♫ Sound: On'
-            : '♫ Sound: Off';
-
-        button.setAttribute('aria-pressed', String(isEnabled));
-
-    }
-
-    async function startSound() {
-
-        if (starting || enabled) return;
-
-        starting = true;
-        button.textContent = '♫ Starting sound...';
-
-        const AudioContextClass =
-            window.AudioContext || window.webkitAudioContext;
-
-        if (!AudioContextClass) {
-
-            button.textContent = 'Sound not supported';
-            starting = false;
-            return;
-
-        }
-
-        try {
-
-            if (!audioContext || audioContext.state === 'closed') {
-
-                audioContext = new AudioContextClass();
-                masterGain = audioContext.createGain();
-
-                masterGain.gain.value = 0;
-                masterGain.connect(audioContext.destination);
-
-                const tones = [
-                    { frequency: 55, volume: 0.45, type: 'sine' },
-                    { frequency: 82.41, volume: 0.18, type: 'triangle' },
-                    { frequency: 110, volume: 0.08, type: 'sine' }
-                ];
-
-                tones.forEach(tone => {
-
-                    const oscillator = audioContext.createOscillator();
-                    const gain = audioContext.createGain();
-
-                    oscillator.type = tone.type;
-                    oscillator.frequency.value = tone.frequency;
-                    gain.gain.value = tone.volume;
-
-                    oscillator.connect(gain);
-                    gain.connect(masterGain);
-
-                    oscillator.start();
-
-                });
-
-            }
-
-            await audioContext.resume();
-
-            if (audioContext.state !== 'running') {
-                throw new Error('The browser did not start the audio context.');
-            }
-
-            masterGain.gain.cancelScheduledValues(audioContext.currentTime);
-
-            masterGain.gain.setTargetAtTime(
-                0.22,
-                audioContext.currentTime,
-                0.7
-            );
-
-            enabled = true;
-            setButtonState(true);
-
-        } catch (error) {
-
-            console.error(
-                'Could not start Ghost Heist ambient sound:',
-                error
-            );
-
-            button.textContent = 'Sound unavailable';
-            button.setAttribute('aria-pressed', 'false');
-
-        } finally {
-
-            starting = false;
-
-        }
-
-    }
-
-    async function stopSound() {
-
-        if (audioContext && masterGain) {
-
-            masterGain.gain.cancelScheduledValues(audioContext.currentTime);
-
-            masterGain.gain.setTargetAtTime(
-                0,
-                audioContext.currentTime,
-                0.12
-            );
-
-        }
-
-        enabled = false;
-        setButtonState(false);
-
-    }
-
-    button.addEventListener('click', async () => {
-
-        if (enabled) {
-            await stopSound();
-        } else {
-            await startSound();
-        }
-
-    });
-
-    document.addEventListener('visibilitychange', () => {
-
-        if (document.hidden && enabled) {
-            stopSound();
-        }
-
-    });
-
-})();
-
-</script>
 
 </body>
 </html>
