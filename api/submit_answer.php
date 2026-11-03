@@ -111,7 +111,7 @@ try {
     // Check saved progress again inside the transaction.
     $stmt = $pdo->prepare(
         'SELECT room_number
-         FROM room_progress
+         FROM room_progress_v2
          WHERE user_id = ? AND difficulty = ?
            AND room_number BETWEEN 1 AND 3'
     );
@@ -150,13 +150,28 @@ try {
     // Room 1 = Wooden Key 1
     // Room 2 = Wooden Key 2
     // Room 3 = Final treasure chest opened
+       // Save the completed room.
     $stmt = $pdo->prepare(
-        'INSERT INTO room_progress (user_id, difficulty, room_number)
+        'INSERT INTO room_progress_v2 (user_id, difficulty, room_number)
          VALUES (?, ?, ?)'
     );
 
     $stmt->execute([$userId, $difficulty, $room]);
 
+    // Award 1,000 gold when the player completes Room 3.
+    $goldAwarded = 0;
+
+    if ($room === 3) {
+        $goldAwarded = 1000;
+
+        $stmt = $pdo->prepare(
+            'UPDATE users SET gold = gold + ? WHERE id = ?'
+        );
+
+        $stmt->execute([$goldAwarded, $userId]);
+    }
+
+    // Save room progress and gold together.
     $pdo->commit();
 
     $_SESSION['ghost_heist_puzzle']['completed'] = true;
@@ -192,17 +207,18 @@ try {
     }
 
     // Final Room: treasure chest successfully opened.
-    respond(200, [
-        'success' => true,
-        'correct' => true,
-        'coinsAwarded' => 0,
-        'rewardType' => 'treasure',
-        'keysEarned' => 2,
-        'gameCompleted' => true,
-        'room' => 3,
-        'difficulty' => $difficulty,
-        'message' => 'Congratulations! You used both wooden keys, solved the final puzzle, and unlocked the treasure chest. You completed Ghost Heist!'
-    ]);
+respond(200, [
+    'success' => true,
+    'correct' => true,
+    'coinsAwarded' => 0,
+    'goldAwarded' => $goldAwarded,
+    'rewardType' => 'treasure',
+    'keysEarned' => 2,
+    'gameCompleted' => true,
+    'room' => 3,
+    'difficulty' => $difficulty,
+    'message' => 'Congratulations! You unlocked the treasure chest and earned 1,000 gold!'
+]);
 
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) {

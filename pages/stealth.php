@@ -309,7 +309,82 @@ kbd {
 #puzzleFeedback {
     font-weight: bold;
     line-height: 1.5;
-    min-height: 24px;
+    min-height: 24px;}
+
+.treasure-celebration {
+    position: relative;
+    overflow: hidden;
+    padding: 20px 10px;
+    margin: 15px 0;
+    background: linear-gradient(135deg, #fff5c2, #ffe3a0, #fff8dc);
+    border: 3px solid #ffc83d;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.treasure-celebration[hidden] {
+    display: none;
+}
+
+.treasure-bag {
+    font-size: 105px;
+    line-height: 1.3;
+    animation: treasureBounce 0.8s ease-in-out infinite alternate;
+}
+
+.gold-coins {
+    font-size: 30px;
+    animation: coinBounce 0.7s ease-in-out infinite alternate;
+}
+
+.gold-amount {
+    color: #bd7600;
+    font-size: 36px;
+    font-weight: 900;
+    animation: goldPop 0.6s ease-out;
+}
+
+.treasure-message {
+    color: #754300;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.treasure-submessage {
+    color: #785d25;
+    font-weight: bold;
+}
+
+.confetti-burst span {
+    display: inline-block;
+    margin: 5px;
+    font-size: 25px;
+    animation: confettiFloat 1.5s ease-in-out infinite alternate;
+}
+
+.confetti-burst span:nth-child(even) {
+    animation-delay: 0.4s;
+}
+
+@keyframes treasureBounce {
+    from { transform: translateY(0) rotate(-4deg); }
+    to { transform: translateY(-14px) rotate(4deg); }
+}
+
+@keyframes coinBounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-9px); }
+}
+
+@keyframes goldPop {
+    from { transform: scale(0.4); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes confettiFloat {
+    from { transform: translateY(12px) rotate(-15deg); }
+    to { transform: translateY(-15px) rotate(25deg); }
+}
 }
 
 #puzzleModal button:disabled {
@@ -767,10 +842,10 @@ footer {
     </div>
 
     <div id="keyInventory">
-        <strong>YOUR KEYS:</strong>
-        <span id="key1" class="key-item">🔑 Wooden Key 1</span>
-        <span id="key2" class="key-item">🔑 Wooden Key 2</span>
-    </div>
+    <strong>YOUR KEYS:</strong>
+    <span id="key1" class="key-item">&#128273; Wooden Key 1</span>
+    <span id="key2" class="key-item">&#128273; Wooden Key 2</span>
+</div>
 
     <div id="interactionPrompt">
         ✦ PRESS E OR CLICK INTERACT ✦
@@ -808,6 +883,39 @@ footer {
             </form>
 
             <p id="puzzleFeedback" role="status" aria-live="polite"></p>
+
+            <div id="treasureCelebration" class="treasure-celebration" hidden>
+
+    <div class="confetti-burst" aria-hidden="true">
+        <span>🎉</span>
+        <span>✨</span>
+        <span>🎊</span>
+        <span>⭐</span>
+        <span>🎉</span>
+        <span>✨</span>
+        <span>🎊</span>
+        <span>⭐</span>
+    </div>
+
+    <div class="treasure-bag" aria-hidden="true">
+        <span>💰</span>
+    </div>
+
+    <div class="gold-coins" aria-hidden="true">
+        🪙 🪙 🪙 🪙 🪙
+    </div>
+
+    <h2 class="gold-amount">+1,000 GOLD!</h2>
+
+    <p class="treasure-message">
+        YOU FOUND THE TREASURE!
+    </p>
+
+    <p class="treasure-submessage">
+        The treasure is yours! Amazing work!
+    </p>
+
+</div>
 
             <button
                 id="continueButton"
@@ -2504,23 +2612,36 @@ answerForm.addEventListener('submit', async function(event) {
 
         } else {
 
-            puzzleTitle.textContent =
-                '🏆 TREASURE UNLOCKED!';
+    const goldEarned = Number(data.goldAwarded) || 1000;
 
-            puzzleDescription.textContent =
-                'Congratulations! You completed all three rooms of Ghost Heist!';
+    // Hide the puzzle image and show the celebration.
+    document.getElementById('puzzleImage').style.display = 'none';
 
-            puzzleFeedback.textContent =
-                data.message || 'You successfully found the treasure!';
+    const celebration =
+        document.getElementById('treasureCelebration');
 
-            continueButton.textContent =
-                'Return to Room Map';
+    celebration.hidden = false;
 
-            continueButton.style.display = 'inline-block';
+    // Update the treasure message.
+    puzzleTitle.textContent = 'TREASURE UNLOCKED!';
 
-            message.textContent =
-                'You completed Ghost Heist!';
-        }
+    puzzleDescription.textContent =
+        'You solved the final Banana Puzzle!';
+
+    puzzleFeedback.textContent =
+        'Amazing! You found the hidden treasure!';
+
+    // Display the gold reward.
+    document.querySelector('.gold-amount').textContent =
+        `+${goldEarned.toLocaleString()} GOLD!`;
+
+    continueButton.textContent = 'Collect Treasure & Return to Map';
+
+    continueButton.style.display = 'inline-block';
+
+    message.textContent =
+        `Congratulations! You earned ${goldEarned.toLocaleString()} gold!`;
+}
 
     } catch (error) {
 
