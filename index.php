@@ -1,1059 +1,653 @@
 
+<?php
+// Ghost Heist - Public landing page
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#07070b">
-    <meta name="description" content="Enter Ghost Heist, solve five haunted number puzzles and claim the hidden treasure.">
-    <title>Ghost Heist | Enter If You Dare</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Heist | Sneak, Solve & Steal!</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --red: #c32936;
-            --red-light: #ff4655;
-            --white: #f3f0ed;
-            --muted: #b5b0b5;
-            --dark: #07070b;
+            --navy: #20234b;
+            --purple: #7357e8;
+            --yellow: #ffcf45;
+            --pink: #ff7197;
+            --blue: #66c8f2;
+            --cream: #fff9ed;
+            --green: #77d6a1;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 30px;
         }
 
         body {
-            margin: 0;
-            background: var(--dark);
-            color: var(--white);
-            font-family: Inter, sans-serif;
+            font-family: 'Nunito', sans-serif;
+            background: var(--cream);
+            color: var(--navy);
             overflow-x: hidden;
         }
 
         a {
-            color: inherit;
             text-decoration: none;
+            color: inherit;
         }
 
-        button { font-family: inherit; }
-
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: 10;
-            pointer-events: none;
-            opacity: .12;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+        button, a {
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Haunted mansion background */
-        .hero {
-            position: relative;
-            isolation: isolate;
-            min-height: 100svh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background: #09080d;
-        }
-
-        .scene {
-            position: absolute;
-            inset: 0;
-            z-index: -3;
-            background-image: url("https://images.unsplash.com/photo-1657265514497-02611707af59?auto=format&fit=crop&fm=jpg&q=85&w=2400");
-            background-size: cover;
-            background-position: center 48%;
-            transform: scale(1.04);
-            animation: sceneReveal 2s ease-out both,
-                       slowZoom 24s ease-in-out infinite alternate;
-        }
-
-        .scene::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(90deg, #050509 0%, #050509e8 24%, #0505098a 58%, #0505093b 100%),
-                linear-gradient(0deg, #07070b 0%, transparent 32%, #0505096b 100%),
-                linear-gradient(180deg, #05050985, transparent 25%);
-        }
-
-        .red-glow {
-            position: absolute;
-            z-index: -2;
-            width: 50vw;
-            height: 50vw;
-            max-width: 600px;
-            max-height: 600px;
-            right: -15%;
-            top: 12%;
-            border-radius: 50%;
-            background: #a20e1d;
-            filter: blur(150px);
-            opacity: .17;
-            animation: pulse 6s ease-in-out infinite alternate;
-        }
-
-        .fog {
-            position: absolute;
-            z-index: -1;
-            left: -20%;
-            bottom: -30%;
-            width: 140%;
-            height: 65%;
-            pointer-events: none;
-            filter: blur(30px);
-            opacity: .5;
-            background:
-                radial-gradient(ellipse at 20% 50%, #c4c3d51b, transparent 42%),
-                radial-gradient(ellipse at 65% 30%, #d4d0e31a, transparent 44%),
-                radial-gradient(ellipse at 85% 70%, #b7b1ce17, transparent 40%);
-            animation: fogDrift 18s ease-in-out infinite alternate;
-        }
-
-        #rain {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: .45;
-        }
-
-        /* Navigation */
         .navbar {
-            position: relative;
-            z-index: 3;
-            width: min(1380px, 90%);
-            margin: 0 auto;
-            min-height: 92px;
+            width: 100%;
+            min-height: 78px;
+            padding: 14px 7%;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 24px;
-            border-bottom: 1px solid #ffffff17;
+            align-items: center;
+            background: #fff;
+            border-bottom: 3px solid var(--navy);
+            position: relative;
+            z-index: 10;
         }
 
         .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: .88rem;
-            font-weight: 800;
-            letter-spacing: 4px;
-            white-space: nowrap;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 29px;
+            font-weight: 700;
+            color: var(--purple);
         }
 
-        .brand-mark {
-            width: 37px;
-            height: 37px;
-            display: grid;
-            place-items: center;
-            border: 1px solid #ff46556b;
-            color: var(--red-light);
-            font-size: 1.35rem;
-            box-shadow: 0 0 25px #c3293626;
+        .brand span {
+            color: var(--pink);
         }
-
-        .brand span:last-child { color: var(--red-light); }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 25px;
+            gap: 28px;
+            font-weight: 800;
         }
 
-        .nav-links a {
-            color: #d0cbd0;
-            font-size: .78rem;
-            font-weight: 600;
-            transition: color .2s;
+        .nav-links a:hover {
+            color: var(--purple);
         }
 
-        .nav-links a:hover { color: white; }
-
-        .nav-login {
-            border: 1px solid #ffffff47;
-            padding: 11px 19px;
+        .nav-button {
+            background: var(--yellow);
+            padding: 11px 23px;
+            border: 2px solid var(--navy);
+            border-radius: 14px;
+            box-shadow: 3px 4px 0 var(--navy);
+            transition: .2s;
         }
 
-        .sound-toggle {
-            display: flex;
+        .nav-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 2px 0 var(--navy);
+            color: var(--navy) !important;
+        }
+
+        .hero {
+            min-height: 650px;
+            padding: 75px 8%;
+            display: grid;
+            grid-template-columns: 1.05fr .95fr;
             align-items: center;
-            gap: 9px;
-            padding: 10px 13px;
-            background: #08070a75;
-            border: 1px solid #ffffff29;
-            color: white;
-            font: inherit;
-            font-size: .68rem;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: border-color .2s, background .2s;
+            gap: 35px;
+            background:
+                radial-gradient(circle at 10% 15%, #ffffff 0 5px, transparent 6px),
+                radial-gradient(circle at 90% 80%, #ffffff 0 7px, transparent 8px),
+                #b8eaff;
+            position: relative;
+            overflow: hidden;
         }
 
-        .sound-toggle:hover {
-            border-color: var(--red-light);
-            background: #c3293620;
-        }
-
-        .sound-dot {
-            width: 7px;
-            height: 7px;
-            flex-shrink: 0;
-            border-radius: 50%;
-            background: #858087;
-        }
-
-        .sound-toggle[aria-pressed="true"] .sound-dot {
-            background: #ef3d4d;
-            box-shadow: 0 0 12px #ef3d4d;
-            animation: pulse 1.4s infinite alternate;
-        }
-
-        /* Hero content */
         .hero-content {
             position: relative;
             z-index: 2;
-            width: min(1380px, 90%);
-            margin: auto;
-            padding: 75px 0 85px;
-            animation: contentReveal 1.2s .2s both;
         }
 
-        .eyebrow {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #ff6975;
-            font-size: .7rem;
-            font-weight: 800;
-            letter-spacing: 4px;
-            text-transform: uppercase;
+        .tag {
+            display: inline-block;
+            padding: 9px 17px;
+            background: var(--pink);
+            color: #fff;
+            border: 2px solid var(--navy);
+            border-radius: 30px;
+            font-weight: 900;
+            transform: rotate(-2deg);
+            margin-bottom: 20px;
         }
 
-        .eyebrow::before {
-            content: "";
-            width: 32px;
-            height: 1px;
-            background: var(--red-light);
-            box-shadow: 0 0 10px var(--red);
+        .hero h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(55px, 7vw, 88px);
+            line-height: .98;
+            font-weight: 700;
+            letter-spacing: -2px;
+            text-shadow: 4px 5px 0 #fff;
         }
 
-        h1 {
-            margin: 25px 0 20px;
-            max-width: 900px;
-            font-family: Creepster, Georgia, serif;
-            font-size: clamp(5rem, 12vw, 10.5rem);
-            font-weight: 400;
-            line-height: .78;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 5px 35px #000;
-        }
-
-        h1 .line-two {
-            display: block;
-            margin-top: 20px;
-            color: var(--red-light);
-            text-shadow: 0 0 35px #a40d1c56, 0 5px 35px #000;
+        .hero h1 span {
+            color: var(--purple);
+            text-shadow: 4px 5px 0 #fff;
         }
 
         .hero-description {
-            max-width: 480px;
-            margin: 30px 0;
-            color: #d0cbd0;
-            font-size: .97rem;
-            line-height: 1.9;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.8;
+            max-width: 510px;
+            margin: 24px 0 28px;
         }
 
-        .hero-actions {
+        .hero-buttons {
             display: flex;
-            align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 16px;
         }
 
-        .enter-button {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 28px;
-            min-height: 58px;
-            padding: 0 25px;
-            overflow: hidden;
-            background: var(--red);
-            border: 1px solid #ff6671;
-            color: white;
-            font-size: .75rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            transition: .3s;
+        .main-button,
+        .secondary-button {
+            display: inline-block;
+            padding: 15px 29px;
+            border: 3px solid var(--navy);
+            border-radius: 15px;
+            font-weight: 900;
+            font-size: 17px;
+            box-shadow: 5px 5px 0 var(--navy);
+            transition: .2s;
         }
 
-        .enter-button::before {
-            content: "";
-            position: absolute;
-            top: -100%;
-            left: -40%;
-            width: 25%;
-            height: 300%;
-            transform: rotate(25deg);
-            background: #ffffff38;
-            transition: left .5s;
+        .main-button {
+            background: var(--yellow);
         }
-
-        .enter-button:hover {
-            background: #ed293b;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px #d4142b50;
-        }
-
-        .enter-button:hover::before { left: 130%; }
-
-        .enter-button .arrow {
-            font-size: 1.4rem;
-            transition: transform .2s;
-        }
-
-        .enter-button:hover .arrow { transform: translateX(5px); }
 
         .secondary-button {
-            min-height: 58px;
-            display: inline-flex;
-            align-items: center;
-            padding: 0 22px;
-            border: 1px solid #ffffff42;
-            color: #eee9ee;
-            font-size: .73rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            transition: .25s;
+            background: #fff;
         }
 
+        .main-button:hover,
         .secondary-button:hover {
-            background: #ffffff13;
-            border-color: white;
+            transform: translate(3px, 3px);
+            box-shadow: 2px 2px 0 var(--navy);
         }
 
-        .game-stats {
+        .hero-art {
+            min-height: 390px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 35px;
-            margin-top: 58px;
-        }
-
-        .stat {
-            border-left: 1px solid #ff46557d;
-            padding-left: 14px;
-        }
-
-        .stat strong {
-            display: block;
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-
-        .stat span {
-            display: block;
-            margin-top: 5px;
-            color: #bdb6bf;
-            font-size: .61rem;
-            letter-spacing: 1.5px;
-        }
-
-        .warning {
-            position: absolute;
-            z-index: 2;
-            right: 5%;
-            bottom: 45px;
-            writing-mode: vertical-rl;
-            color: #ffffff8c;
-            font-size: .6rem;
-            letter-spacing: 4px;
-        }
-
-        .warning span { color: var(--red-light); }
-
-        .scroll-hint {
-            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 12px;
-            margin-top: 40px;
-            color: #b7b0b9;
-            font-size: .62rem;
-            letter-spacing: 2px;
+            position: relative;
         }
 
-        .scroll-line {
-            width: 42px;
-            height: 1px;
-            background: var(--red-light);
-            animation: linePulse 2s infinite;
+        .comic-circle {
+            width: min(390px, 90%);
+            aspect-ratio: 1;
+            background: var(--yellow);
+            border: 5px solid var(--navy);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 12px 13px 0 var(--navy);
+            position: relative;
         }
 
-        /* Story and instructions */
+        .hero-character {
+            font-size: clamp(125px, 19vw, 220px);
+            filter: drop-shadow(5px 7px 0 rgba(32,35,75,.2));
+            transform: rotate(-7deg);
+        }
+
+        .comic-bubble {
+            position: absolute;
+            top: 8%;
+            right: -3%;
+            background: var(--pink);
+            color: white;
+            border: 3px solid var(--navy);
+            border-radius: 50%;
+            padding: 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: 24px;
+            transform: rotate(12deg);
+            box-shadow: 4px 4px 0 var(--navy);
+        }
+
+        .sparkle {
+            position: absolute;
+            font-size: 40px;
+        }
+
+        .sparkle-one {
+            left: 0;
+            top: 18%;
+        }
+
+        .sparkle-two {
+            right: 0;
+            bottom: 15%;
+        }
+
         .section {
-            padding: 105px 5%;
+            padding: 85px 8%;
+        }
+
+        .section-heading {
             text-align: center;
-            background:
-                radial-gradient(ellipse at 50% 0%, #34101a40, transparent 55%),
-                #09080c;
+            margin-bottom: 45px;
         }
 
-        .section .eyebrow { justify-content: center; }
-
-        .section h2 {
-            margin: 22px 0;
-            font-size: clamp(2rem, 5vw, 3.8rem);
-            letter-spacing: -2px;
+        .section-heading h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(36px, 5vw, 52px);
+            margin-bottom: 12px;
         }
 
-        .section h2 span { color: var(--red-light); }
+        .section-heading p {
+            font-size: 17px;
+            font-weight: 700;
+            color: #60627c;
+        }
 
-        .section-intro {
-            max-width: 620px;
-            margin: 0 auto;
-            color: var(--muted);
+        .about {
+            background: #fff;
+        }
+
+        .about-content {
+            max-width: 850px;
+            margin: auto;
+            text-align: center;
+            font-size: 18px;
             line-height: 1.9;
+            font-weight: 700;
+        }
+
+        .about-highlight {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 13px 22px;
+            background: #fff0a9;
+            border: 2px solid var(--navy);
+            border-radius: 15px;
+            font-weight: 900;
+        }
+
+        .rooms {
+            background: #f5eaff;
+        }
+
+        .room-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .room-card {
+            background: #fff;
+            border: 3px solid var(--navy);
+            border-radius: 22px;
+            padding: 28px 23px;
+            text-align: center;
+            box-shadow: 6px 7px 0 var(--navy);
+            transition: .2s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-7px) rotate(-1deg);
+        }
+
+        .room-icon {
+            width: 105px;
+            height: 105px;
+            margin: 0 auto 20px;
+            display: grid;
+            place-items: center;
+            border: 3px solid var(--navy);
+            border-radius: 25px;
+            font-size: 55px;
+        }
+
+        .room-card:nth-child(1) .room-icon {
+            background: #ffdf83;
+        }
+
+        .room-card:nth-child(2) .room-icon {
+            background: #ffb7ca;
+        }
+
+        .room-card:nth-child(3) .room-icon {
+            background: #a9e8c4;
+        }
+
+        .room-card h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .room-card p {
+            color: #66677d;
+            line-height: 1.7;
+            font-weight: 700;
+        }
+
+        .how-to {
+            background: var(--yellow);
         }
 
         .steps {
-            width: min(1050px, 100%);
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin: 55px auto 0;
-            text-align: left;
+            gap: 22px;
+            max-width: 1050px;
+            margin: auto;
         }
 
-        .step-card {
-            padding: 28px;
-            border: 1px solid #ffffff16;
-            background: linear-gradient(145deg, #19151b, #0c0a0f);
-            transition: .3s;
-        }
-
-        .step-card:hover {
-            transform: translateY(-6px);
-            border-color: #c329367d;
+        .step {
+            background: #fff;
+            border: 3px solid var(--navy);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 5px 6px 0 var(--navy);
         }
 
         .step-number {
-            color: var(--red-light);
-            font-size: .78rem;
-            letter-spacing: 2px;
-        }
-
-        .step-card h3 { margin: 22px 0 10px; }
-
-        .step-card p {
-            margin-bottom: 0;
-            color: var(--muted);
-            font-size: .87rem;
-            line-height: 1.8;
-        }
-
-        /* Footer */
-        footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            padding: 28px 5%;
-            border-top: 1px solid #ffffff14;
-            background: #07070b;
-        }
-
-        footer p {
-            color: #9c959e;
-            font-size: .78rem;
-        }
-
-        /* Cinematic registration transition */
-        .transition-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--purple);
+            color: white;
             display: grid;
             place-items: center;
-            background: #030306;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity .8s, visibility .8s;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 24px;
+            border: 2px solid var(--navy);
+            margin-bottom: 15px;
         }
 
-        .transition-screen.active {
-            opacity: 1;
-            visibility: visible;
+        .step h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 22px;
+            margin-bottom: 9px;
         }
 
-        .transition-screen p {
-            padding: 20px;
-            color: var(--red-light);
-            font-family: Creepster, Georgia, serif;
-            font-size: clamp(2rem, 7vw, 5rem);
-            letter-spacing: 4px;
+        .step p {
+            line-height: 1.7;
+            font-weight: 700;
+            color: #66677d;
+        }
+
+        .final-cta {
+            padding: 75px 8%;
+            background: var(--purple);
+            color: #fff;
             text-align: center;
-            animation: pulse 1s infinite alternate;
         }
 
-        .glitch { animation: glitch .25s steps(2, end); }
-
-        /* Animations */
-        @keyframes sceneReveal {
-            from { opacity: 0; filter: brightness(0); }
-            to { opacity: 1; filter: brightness(1); }
+        .final-cta h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(38px, 5vw, 55px);
+            margin-bottom: 15px;
         }
 
-        @keyframes slowZoom {
-            from { transform: scale(1.04); }
-            to { transform: scale(1.13); }
+        .final-cta p {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 28px;
         }
 
-        @keyframes contentReveal {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        .final-cta .main-button {
+            display: inline-block;
         }
 
-        @keyframes fogDrift {
-            from { transform: translateX(-4%) translateY(0); }
-            to { transform: translateX(5%) translateY(-10%); }
+        footer {
+            padding: 28px 8%;
+            background: var(--navy);
+            color: #fff;
+            text-align: center;
+            font-weight: 700;
         }
 
-        @keyframes pulse {
-            from { opacity: .55; }
-            to { opacity: 1; }
+        footer span {
+            color: var(--yellow);
         }
 
-        @keyframes linePulse {
-            0%, 100% {
-                opacity: .35;
-                transform: scaleX(.65);
-                transform-origin: left;
+        @media (max-width: 850px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding-top: 65px;
             }
-            50% {
-                opacity: 1;
-                transform: scaleX(1);
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-art {
+                min-height: 330px;
+            }
+
+            .room-grid,
+            .steps {
+                grid-template-columns: 1fr;
+                max-width: 480px;
             }
         }
 
-        @keyframes glitch {
-            0% { transform: translate(0); filter: none; }
-            25% { transform: translate(-4px, 2px); filter: hue-rotate(90deg); }
-            50% { transform: translate(3px, -1px); filter: contrast(1.8); }
-            75% { transform: translate(-2px, -2px); }
-            100% { transform: translate(0); filter: none; }
-        }
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 13px 5%;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
 
-        /* Responsive layout */
-        @media (max-width: 760px) {
-            .navbar { min-height: 75px; }
-            .nav-links { gap: 14px; }
-            .nav-links .optional { display: none; }
-            .brand { letter-spacing: 2px; font-size: .75rem; }
-            .sound-toggle { padding: 9px; }
-            .hero-content { padding: 85px 0 75px; }
-            h1 { font-size: clamp(4.5rem, 17vw, 7.5rem); }
-            .hero-description { font-size: .9rem; }
-            .game-stats { gap: 20px; margin-top: 45px; }
-            .stat strong { font-size: 1.2rem; }
-            .warning { display: none; }
-            .steps { grid-template-columns: 1fr; }
-            .section { padding: 75px 6%; }
-        }
+            .brand {
+                font-size: 25px;
+            }
 
-        @media (max-width: 420px) {
-            .navbar { width: 92%; gap: 10px; }
-            .brand { gap: 7px; font-size: .66rem; }
-            .brand-mark { width: 30px; height: 30px; }
-            .nav-links { gap: 8px; }
-            .nav-links a { font-size: .68rem; }
-            .nav-login { padding: 9px; }
-            .sound-toggle { padding: 9px 7px; }
-            .sound-label { font-size: .58rem; }
-            .hero-content { width: 88%; }
-            .hero-actions { align-items: stretch; flex-direction: column; }
-            .enter-button, .secondary-button { justify-content: center; }
-            .game-stats { gap: 13px; }
-            .stat { padding-left: 9px; }
-            .stat span { font-size: .52rem; letter-spacing: .7px; }
-        }
+            .nav-links {
+                gap: 14px;
+                font-size: 13px;
+            }
 
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: .01ms !important;
-                animation-iteration-count: 1 !important;
-                scroll-behavior: auto !important;
+            .nav-links .nav-button {
+                padding: 8px 12px;
+            }
+
+            .hero {
+                padding: 55px 6%;
+            }
+
+            .hero-art {
+                min-height: 280px;
+            }
+
+            .comic-bubble {
+                font-size: 17px;
+                padding: 14px;
+            }
+
+            .section {
+                padding: 65px 6%;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="transition-screen" id="transitionScreen" aria-hidden="true">
-        <p>THE DOOR IS OPENING...</p>
-    </div>
 
-    <main>
-        <section class="hero">
-            <div class="scene" aria-hidden="true"></div>
-            <div class="red-glow" aria-hidden="true"></div>
-            <div class="fog" aria-hidden="true"></div>
-            <canvas id="rain" aria-hidden="true"></canvas>
+<header class="navbar">
+    <a href="index.php" class="brand">GHOST <span>HEIST</span> 🎭</a>
 
-            <header class="navbar">
-                <a class="brand" href="index.php" aria-label="Ghost Heist home">
-                    <span class="brand-mark">G</span>
-                    GHOST <span>HEIST</span>
-                </a>
+    <nav class="nav-links">
+        <a href="#about">About</a>
+        <a href="#how-to-play">How to Play</a>
+        <a href="login.php">Log In</a>
+        <a href="register.php" class="nav-button">Join the Heist</a>
+    </nav>
+</header>
 
-                <nav class="nav-links" aria-label="Main navigation">
-                    <a class="optional" href="#about">THE STORY</a>
-                    <a class="optional" href="#how-to-play">HOW TO PLAY</a>
-                    <a class="nav-login" href="login.php">LOG IN</a>
+<main>
+    <section class="hero">
+        <div class="hero-content">
+            <span class="tag">🎮 THE ULTIMATE SNEAKY ADVENTURE</span>
 
-                    <button class="sound-toggle" id="soundToggle"
-                        type="button" aria-pressed="false">
-                        <span class="sound-dot"></span>
-                        <span class="sound-label" id="soundLabel">SOUND OFF</span>
-                    </button>
-                </nav>
-            </header>
+            <h1>
+                SNEAK IN.<br>
+                GRAB THE<br>
+                <span>TREASURE!</span>
+            </h1>
 
-            <div class="hero-content">
-                <p class="eyebrow">YOU WERE NOT INVITED</p>
-
-                <h1 id="heroTitle">
-                    ENTER IF
-                    <span class="line-two">YOU DARE.</span>
-                </h1>
-
-                <p class="hero-description">
-                    Behind these walls lie five haunted rooms, deadly
-                    number puzzles, and a treasure guarded by something
-                    that never sleeps. Solve the mystery. Outsmart the
-                    ghost. Get out with the gold.
-                </p>
-
-                <div class="hero-actions">
-                    <a class="enter-button" id="enterButton" href="register.php">
-                        <span>ENTER THE MANSION</span>
-                        <span class="arrow" aria-hidden="true">&rarr;</span>
-                    </a>
-
-                    <a class="secondary-button" href="#how-to-play">
-                        DISCOVER THE RULES
-                    </a>
-                </div>
-
-                <div class="game-stats">
-                    <div class="stat">
-                        <strong>05</strong>
-                        <span>HAUNTED ROOMS</span>
-                    </div>
-                    <div class="stat">
-                        <strong>100</strong>
-                        <span>COINS PER ROOM</span>
-                    </div>
-                    <div class="stat">
-                        <strong>01</strong>
-                        <span>HIDDEN TREASURE</span>
-                    </div>
-                </div>
-
-                <a class="scroll-hint" href="#about">
-                    <span class="scroll-line"></span>
-                    DESCEND INTO THE UNKNOWN
-                </a>
-            </div>
-
-            <div class="warning">
-                <span>WARNING</span> &nbsp; THERE IS NO GUARANTEE YOU WILL LEAVE
-            </div>
-        </section>
-
-        <section class="section" id="about">
-            <p class="eyebrow">THE LEGEND</p>
-            <h2>THE HOUSE KNOWS <span>YOU'RE HERE.</span></h2>
-            <p class="section-intro">
-                An abandoned mansion. A fortune nobody has claimed.
-                Five doors stand between you and the treasure.
-                Every room tests your mind, and every mistake brings
-                you closer to the thing waiting in the dark.
+            <p class="hero-description">
+                Ready for a hilarious heist? Sneak past the guards,
+                hide from watchful eyes, solve tricky Banana puzzles
+                and collect the treasure. One wrong move and you're caught!
             </p>
-        </section>
 
-        <section class="section" id="how-to-play">
-            <p class="eyebrow">YOUR SURVIVAL GUIDE</p>
-            <h2>THREE STEPS. <span>NO SECOND CHANCES.</span></h2>
-
-            <div class="steps">
-                <article class="step-card">
-                    <span class="step-number">01 / THE ENTRY</span>
-                    <h3>Choose Your Path</h3>
-                    <p>Create your identity, choose a difficulty, and enter the mansion.</p>
-                </article>
-
-                <article class="step-card">
-                    <span class="step-number">02 / THE TRIAL</span>
-                    <h3>Defeat the Puzzles</h3>
-                    <p>Find the missing numbers and unlock the next haunted room.</p>
-                </article>
-
-                <article class="step-card">
-                    <span class="step-number">03 / THE PRIZE</span>
-                    <h3>Claim the Treasure</h3>
-                    <p>Earn coins, complete all five rooms, and discover what lies in the vault.</p>
-                </article>
+            <div class="hero-buttons">
+                <a href="register.php" class="main-button">🚀 Play Now</a>
+                <a href="login.php" class="secondary-button">Log In</a>
             </div>
-        </section>
-    </main>
-
-    <footer>
-        <a class="brand" href="index.php">
-            <span class="brand-mark">G</span>
-            GHOST <span>HEIST</span>
-        </a>
-        <p>Think fast. Stay brave. Take the treasure.</p>
-    </footer>
-
-    <script>
-        // Animated rain with safe pause/resume handling.
-        (() => {
-            const canvas = document.getElementById('rain');
-            const ctx = canvas.getContext('2d');
-
-            const reducedMotion = window.matchMedia(
-                '(prefers-reduced-motion: reduce)'
-            ).matches;
-
-            let drops = [];
-            let width = 0;
-            let height = 0;
-            let animationId = null;
-            let running = false;
-
-            function resize() {
-                const rect = canvas.getBoundingClientRect();
-                const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-                width = rect.width;
-                height = rect.height;
-
-                canvas.width = Math.round(width * dpr);
-                canvas.height = Math.round(height * dpr);
-                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-                drops = Array.from(
-                    { length: Math.min(Math.floor(width / 5), 190) },
-                    () => ({
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        length: 9 + Math.random() * 18,
-                        speed: 5 + Math.random() * 9,
-                        opacity: .08 + Math.random() * .23
-                    })
-                );
-            }
-
-            function drawRain() {
-                if (!running) return;
-
-                ctx.clearRect(0, 0, width, height);
-
-                drops.forEach(drop => {
-                    ctx.strokeStyle =
-                        `rgba(190, 198, 220, ${drop.opacity})`;
-                    ctx.lineWidth = .7;
-                    ctx.beginPath();
-                    ctx.moveTo(drop.x, drop.y);
-                    ctx.lineTo(drop.x - 2, drop.y + drop.length);
-                    ctx.stroke();
-
-                    drop.y += drop.speed;
-                    drop.x -= .8;
-
-                    if (drop.y > height) {
-                        drop.y = -drop.length;
-                        drop.x = Math.random() * width;
-                    }
-
-                    if (drop.x < 0) drop.x = width;
-                });
-
-                animationId = requestAnimationFrame(drawRain);
-            }
-
-            function startRain() {
-                if (running || reducedMotion) return;
-                running = true;
-                drawRain();
-            }
-
-            function stopRain() {
-                running = false;
-
-                if (animationId !== null) {
-                    cancelAnimationFrame(animationId);
-                    animationId = null;
-                }
-            }
-
-            resize();
-            window.addEventListener('resize', resize);
-            startRain();
-
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    stopRain();
-                } else {
-                    startRain();
-                }
-            });
-        })();
-
-        // Layered horror ambience: deep rumble, wind and ghostly tones.
-        // Click the sound button to enable audio; browsers block autoplay.
-        (() => {
-            const button = document.getElementById('soundToggle');
-            const label = document.getElementById('soundLabel');
-
-            let audioContext = null;
-            let masterGain = null;
-            let enabled = false;
-            let oscillators = [];
-            let noiseSource = null;
-            let noiseFilter = null;
-            let windLfo = null;
-
-            function createNoiseBuffer(context) {
-                const buffer = context.createBuffer(
-                    1,
-                    context.sampleRate * 4,
-                    context.sampleRate
-                );
-
-                const data = buffer.getChannelData(0);
-
-                for (let i = 0; i < data.length; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-
-                return buffer;
-            }
-
-            function buildHorrorSound() {
-                const AudioContextClass =
-                    window.AudioContext || window.webkitAudioContext;
-
-                if (!AudioContextClass) {
-                    throw new Error('Web Audio API is not supported by this browser.');
-                }
-
-                audioContext = new AudioContextClass();
-
-                masterGain = audioContext.createGain();
-                masterGain.gain.value = 0;
-                masterGain.connect(audioContext.destination);
-
-                // Deep haunted-house rumble.
-                [
-                    { frequency: 42, type: 'sine', volume: 0.22 },
-                    { frequency: 55, type: 'triangle', volume: 0.13 },
-                    { frequency: 73.4, type: 'sine', volume: 0.09 }
-                ].forEach(tone => {
-                    const oscillator = audioContext.createOscillator();
-                    const gain = audioContext.createGain();
-
-                    oscillator.type = tone.type;
-                    oscillator.frequency.value = tone.frequency;
-                    gain.gain.value = tone.volume;
-
-                    oscillator.connect(gain);
-                    gain.connect(masterGain);
-                    oscillator.start();
-
-                    oscillators.push(oscillator);
-                });
-
-                // Filtered noise creates a continuous wind-like sound.
-                noiseSource = audioContext.createBufferSource();
-                noiseSource.buffer = createNoiseBuffer(audioContext);
-                noiseSource.loop = true;
-
-                noiseFilter = audioContext.createBiquadFilter();
-                noiseFilter.type = 'lowpass';
-                noiseFilter.frequency.value = 450;
-                noiseFilter.Q.value = 0.7;
-
-                const windGain = audioContext.createGain();
-                windGain.gain.value = 0.22;
-
-                noiseSource.connect(noiseFilter);
-                noiseFilter.connect(windGain);
-                windGain.connect(masterGain);
-                noiseSource.start();
-
-                // Slowly moving filter makes the wind sound less static.
-                windLfo = audioContext.createOscillator();
-                const windLfoGain = audioContext.createGain();
-
-                windLfo.frequency.value = 0.08;
-                windLfoGain.gain.value = 260;
-
-                windLfo.connect(windLfoGain);
-                windLfoGain.connect(noiseFilter.frequency);
-                windLfo.start();
-
-                oscillators.push(windLfo);
-
-                // Dissonant high tones add a ghostly atmosphere.
-                [
-                    { frequency: 174.6, volume: 0.035 },
-                    { frequency: 185, volume: 0.025 },
-                    { frequency: 277.2, volume: 0.018 }
-                ].forEach(tone => {
-                    const oscillator = audioContext.createOscillator();
-                    const gain = audioContext.createGain();
-
-                    oscillator.type = 'sine';
-                    oscillator.frequency.value = tone.frequency;
-                    gain.gain.value = tone.volume;
-
-                    oscillator.connect(gain);
-                    gain.connect(masterGain);
-                    oscillator.start();
-
-                    oscillators.push(oscillator);
-                });
-            }
-
-            async function startSound() {
-                try {
-                    if (!audioContext) {
-                        buildHorrorSound();
-                    }
-
-                    await audioContext.resume();
-
-                    if (audioContext.state !== 'running') {
-                        throw new Error('Browser audio is not running.');
-                    }
-
-                    masterGain.gain.cancelScheduledValues(
-                        audioContext.currentTime
-                    );
-
-                    masterGain.gain.setTargetAtTime(
-                        0.8,
-                        audioContext.currentTime,
-                        0.5
-                    );
-
-                    enabled = true;
-                    button.setAttribute('aria-pressed', 'true');
-                    label.textContent = 'SOUND ON';
-                } catch (error) {
-                    console.error('Horror sound error:', error);
-                    enabled = false;
-                    button.setAttribute('aria-pressed', 'false');
-                    label.textContent = 'AUDIO ERROR';
-                }
-            }
-
-            function stopSound() {
-                if (audioContext && masterGain) {
-                    masterGain.gain.cancelScheduledValues(
-                        audioContext.currentTime
-                    );
-
-                    masterGain.gain.setTargetAtTime(
-                        0,
-                        audioContext.currentTime,
-                        0.15
-                    );
-                }
-
-                enabled = false;
-                button.setAttribute('aria-pressed', 'false');
-                label.textContent = 'SOUND OFF';
-            }
-
-            button.addEventListener('click', () => {
-                if (enabled) {
-                    stopSound();
-                } else {
-                    startSound();
-                }
-            });
-        })();
-
-        // Occasional visual disturbance on the heading.
-        (() => {
-            const title = document.getElementById('heroTitle');
-
-            const reducedMotion = window.matchMedia(
-                '(prefers-reduced-motion: reduce)'
-            ).matches;
-
-            if (reducedMotion) return;
-
-            function glitchTitle() {
-                title.classList.add('glitch');
-
-                setTimeout(() => {
-                    title.classList.remove('glitch');
-                }, 260);
-
-                setTimeout(
-                    glitchTitle,
-                    6500 + Math.random() * 7000
-                );
-            }
-
-            setTimeout(glitchTitle, 5000);
-        })();
-
-        // Cinematic transition before opening registration.
-        document.getElementById('enterButton').addEventListener(
-            'click',
-            event => {
-                if (
-                    event.ctrlKey ||
-                    event.metaKey ||
-                    event.shiftKey ||
-                    event.altKey ||
-                    event.button !== 0
-                ) {
-                    return;
-                }
-
-                event.preventDefault();
-
-                const destination = event.currentTarget.href;
-                const screen = document.getElementById('transitionScreen');
-
-                screen.classList.add('active');
-                screen.setAttribute('aria-hidden', 'false');
-
-                setTimeout(() => {
-                    window.location.href = destination;
-                }, 850);
-            }
-        );
-    </script>
+        </div>
+
+        <div class="hero-art">
+            <span class="sparkle sparkle-one">✨</span>
+
+            <div class="comic-circle">
+                <div class="hero-character">🥷</div>
+                <div class="comic-bubble">SHHH!</div>
+            </div>
+
+            <span class="sparkle sparkle-two">💰</span>
+        </div>
+    </section>
+
+    <section class="section about" id="about">
+        <div class="section-heading">
+            <h2>What's the Big Heist? 🕵️</h2>
+            <p>A sneaky adventure full of puzzles, guards and surprises!</p>
+        </div>
+
+        <div class="about-content">
+            <p>
+                Welcome to Ghost Heist! Your mission is to explore different
+                rooms, avoid the guards and find hidden objects. But getting
+                the treasure isn't that easy. You must stay out of sight,
+                solve Banana number puzzles and collect the keys needed
+                to unlock the next room.
+            </p>
+
+            <div class="about-highlight">
+                Three rooms. Three challenges. One big treasure! 🏆
+            </div>
+        </div>
+    </section>
+
+    <section class="section rooms" id="rooms">
+        <div class="section-heading">
+            <h2>Your Heist Adventure 🗝️</h2>
+            <p>Three exciting rooms stand between you and the treasure.</p>
+        </div>
+
+        <div class="room-grid">
+            <article class="room-card">
+                <div class="room-icon">🛋️</div>
+                <h3>Room 1: Living Room</h3>
+                <p>
+                    Explore the living room, avoid Granny's watchful eyes,
+                    discover the hidden object and solve the first puzzle.
+                </p>
+            </article>
+
+            <article class="room-card">
+                <div class="room-icon">🍳</div>
+                <h3>Room 2: Kitchen</h3>
+                <p>
+                    Sneak around the kitchen, watch out for the guard
+                    and complete another puzzle to find your next key.
+                </p>
+            </article>
+
+            <article class="room-card">
+                <div class="room-icon">💎</div>
+                <h3>Room 3: Treasure Room</h3>
+                <p>
+                    This is the final challenge! Reach the chest,
+                    avoid getting caught and claim your treasure.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section how-to" id="how-to-play">
+        <div class="section-heading">
+            <h2>How to Play 🎯</h2>
+            <p>Follow these simple steps to become the ultimate sneaky thief.</p>
+        </div>
+
+        <div class="steps">
+            <article class="step">
+                <div class="step-number">1</div>
+                <h3>Move Carefully</h3>
+                <p>
+                    Use your keyboard to move around the room.
+                    Keep an eye on the guards and stay out of their sight.
+                </p>
+            </article>
+
+            <article class="step">
+                <div class="step-number">2</div>
+                <h3>Find & Solve</h3>
+                <p>
+                    Look for sparkling hidden objects. Interact with them
+                    when it is safe and solve the Banana puzzles.
+                </p>
+            </article>
+
+            <article class="step">
+                <div class="step-number">3</div>
+                <h3>Collect the Treasure</h3>
+                <p>
+                    Collect keys to unlock new rooms. Complete all three
+                    challenges and grab the final treasure!
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <h2>Ready to Pull Off the Perfect Heist?</h2>
+        <p>Your adventure is waiting. Can you escape without getting caught?</p>
+        <a href="register.php" class="main-button">Let's Play! 🥷</a>
+    </section>
+</main>
+
+<footer>
+    <p>© <?php echo date('Y'); ?> <span>Ghost Heist</span> · Sneak smart. Solve fast. Get rich!</p>
+</footer>
+
 </body>
 </html>

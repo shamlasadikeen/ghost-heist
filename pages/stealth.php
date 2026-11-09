@@ -385,7 +385,7 @@ kbd {
     from { transform: translateY(12px) rotate(-15deg); }
     to { transform: translateY(-15px) rotate(25deg); }
 }
-}
+
 
 #puzzleModal button:disabled {
     opacity: 0.6;

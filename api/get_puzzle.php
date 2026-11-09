@@ -49,7 +49,7 @@ try {
     // Get completed rooms for this player and difficulty.
     $stmt = $pdo->prepare(
         'SELECT room_number
-         FROM room_progress
+         FROM room_progress_v2
          WHERE user_id = ? AND difficulty = ?
            AND room_number BETWEEN 1 AND 3'
     );

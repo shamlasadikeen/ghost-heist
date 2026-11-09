@@ -49,543 +49,423 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080607">
-    <title>Enter the Mansion | Ghost Heist</title>
+    <meta name="theme-color" content="#fff9ed">
+
+    <title>Login | Ghost Heist</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --red: #ed2638;
-            --red-light: #ff5260;
-            --bg: #080607;
-            --text: #f7f1f1;
-            --muted: #b9abad;
-            --panel: rgba(15, 10, 12, .84);
+            --navy: #20234b;
+            --purple: #7357e8;
+            --yellow: #ffcf45;
+            --pink: #ff7197;
+            --blue: #66c8f2;
+            --cream: #fff9ed;
+            --green: #77d6a1;
         }
 
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
-        html {
-            min-height: 100%;
-            background: var(--bg);
-        }
-
         body {
-            margin: 0;
             min-height: 100vh;
-            color: var(--text);
-            background: var(--bg);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: 0;
+            font-family: 'Nunito', sans-serif;
+            color: var(--navy);
             background:
-                linear-gradient(90deg, rgba(5,4,5,.82), rgba(5,4,5,.35)),
-                linear-gradient(0deg, #080607 0%, transparent 45%, rgba(0,0,0,.38)),
-                url("https://images.unsplash.com/photo-1657265514497-02611707af59?auto=format&fit=crop&fm=jpg&q=85&w=2400")
-                center 55% / cover no-repeat;
-            transform: scale(1.04);
-            animation: backgroundReveal 2s ease-out both,
-                       slowZoom 24s ease-in-out infinite alternate;
+                radial-gradient(circle at 10% 15%, #ffffff 0 5px, transparent 6px),
+                radial-gradient(circle at 90% 80%, #ffffff 0 7px, transparent 8px),
+                var(--cream);
         }
 
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            background:
-                radial-gradient(ellipse at 75% 45%, transparent 5%, rgba(5,3,5,.35) 70%),
-                radial-gradient(ellipse at 15% 90%, rgba(112,0,12,.22), transparent 45%),
-                repeating-linear-gradient(
-                    105deg,
-                    transparent 0 90px,
-                    rgba(255,255,255,.018) 91px,
-                    transparent 92px 160px
-                );
+        a {
+            color: inherit;
+            text-decoration: none;
         }
 
-        #rain {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: .24;
-        }
-
-        .fog {
-            position: fixed;
-            z-index: 1;
-            left: -20%;
-            bottom: -20%;
-            width: 140%;
-            height: 45%;
-            pointer-events: none;
-            background: radial-gradient(ellipse, rgba(175,168,174,.13), transparent 65%);
-            filter: blur(32px);
-            animation: fogDrift 18s ease-in-out infinite alternate;
-        }
-
-        .topbar {
-            position: relative;
-            z-index: 3;
+        .navbar {
+            min-height: 78px;
+            padding: 14px 7%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 25px 6%;
+            background: white;
+            border-bottom: 3px solid var(--navy);
         }
 
         .brand {
-            color: #fff;
-            font-family: 'Creepster', cursive;
-            font-size: 30px;
-            letter-spacing: 2px;
-            text-decoration: none;
-            text-shadow: 0 0 18px rgba(237,38,56,.5);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 29px;
+            font-weight: 700;
+            color: var(--purple);
         }
 
         .brand span {
-            color: var(--red);
+            color: var(--pink);
         }
 
-        .sound-button {
-            border: 1px solid rgba(255,255,255,.2);
+        .home-link {
+            padding: 10px 17px;
+            background: var(--yellow);
+            border: 2px solid var(--navy);
+            border-radius: 12px;
+            box-shadow: 3px 3px 0 var(--navy);
+            font-weight: 900;
+            transition: .2s;
+        }
+
+        .home-link:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--navy);
+        }
+
+        .login-layout {
+            max-width: 1100px;
+            min-height: calc(100vh - 145px);
+            margin: auto;
+            padding: 55px 25px;
+            display: grid;
+            grid-template-columns: 1fr 440px;
+            align-items: center;
+            gap: 65px;
+        }
+
+        .welcome-section {
+            position: relative;
+        }
+
+        .welcome-tag {
+            display: inline-block;
+            padding: 9px 17px;
+            background: var(--pink);
+            color: white;
+            border: 2px solid var(--navy);
             border-radius: 30px;
-            padding: 10px 15px;
-            color: #eee;
-            background: rgba(0,0,0,.55);
-            font: inherit;
-            font-size: 12px;
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-            transition: .25s;
+            font-weight: 900;
+            transform: rotate(-2deg);
+            margin-bottom: 22px;
         }
 
-        .sound-button:hover {
-            border-color: var(--red);
-            box-shadow: 0 0 20px rgba(237,38,56,.18);
+        .welcome-section h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(52px, 7vw, 82px);
+            line-height: .98;
+            letter-spacing: -2px;
+            text-shadow: 4px 5px 0 white;
         }
 
-        .layout {
-            position: relative;
-            z-index: 2;
-            min-height: calc(100vh - 85px);
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(340px, 440px);
-            align-items: center;
-            gap: clamp(35px, 7vw, 110px);
-            max-width: 1350px;
-            margin: 0 auto;
-            padding: 25px 6% 65px;
+        .welcome-section h1 span {
+            color: var(--purple);
         }
 
-        .intro {
-            max-width: 650px;
-            animation: riseIn .9s .1s both;
-        }
-
-        .eyebrow {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--red-light);
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        .eyebrow::before {
-            content: "";
-            width: 32px;
-            height: 1px;
-            background: var(--red);
-            box-shadow: 0 0 10px var(--red);
-        }
-
-        .intro h1 {
-            margin: 20px 0;
-            font-family: 'Creepster', cursive;
-            font-size: clamp(64px, 8vw, 112px);
-            font-weight: 400;
-            line-height: .92;
-            letter-spacing: 1px;
-            text-shadow: 0 4px 30px rgba(0,0,0,.8);
-        }
-
-        .intro h1 span {
-            display: block;
-            color: var(--red);
-            text-shadow: 0 0 30px rgba(237,38,56,.28);
-        }
-
-        .intro-copy {
-            max-width: 470px;
-            color: #d0c5c8;
-            font-size: 15px;
-            line-height: 1.9;
-        }
-
-        .warning {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 30px;
-            color: #c3b6b9;
-            font-size: 11px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .warning-mark {
-            display: grid;
-            place-items: center;
-            width: 34px;
-            height: 34px;
-            flex-shrink: 0;
-            border: 1px solid rgba(237,38,56,.5);
-            color: var(--red-light);
-            background: rgba(237,38,56,.08);
+        .welcome-section p {
+            max-width: 460px;
+            margin-top: 22px;
             font-size: 17px;
+            font-weight: 700;
+            line-height: 1.8;
+            color: #5e6078;
         }
 
-        .auth-card {
+        .character-scene {
             position: relative;
-            padding: 35px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 5px;
-            background: var(--panel);
-            box-shadow:
-                0 30px 100px rgba(0,0,0,.65),
-                0 0 45px rgba(112,0,12,.1),
-                inset 0 1px rgba(255,255,255,.05);
-            backdrop-filter: blur(18px);
-            animation: cardReveal 1s .15s both;
+            width: 260px;
+            height: 210px;
+            margin-top: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--yellow);
+            border: 4px solid var(--navy);
+            border-radius: 45% 55% 48% 52%;
+            box-shadow: 7px 8px 0 var(--navy);
+            transform: rotate(-4deg);
         }
 
-        .auth-card::before {
-            content: "";
+        .character {
+            font-size: 125px;
+            transform: rotate(5deg);
+        }
+
+        .speech-bubble {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--red), transparent);
-            box-shadow: 0 0 20px rgba(237,38,56,.65);
+            top: -22px;
+            right: -45px;
+            padding: 12px 17px;
+            background: white;
+            border: 3px solid var(--navy);
+            border-radius: 18px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            transform: rotate(7deg);
+            box-shadow: 3px 3px 0 var(--navy);
         }
 
-        .card-symbol {
-            width: 48px;
-            height: 48px;
+        .floating-star {
+            position: absolute;
+            font-size: 35px;
+        }
+
+        .star-one {
+            top: 0;
+            left: -20px;
+        }
+
+        .star-two {
+            bottom: 5px;
+            right: -20px;
+        }
+
+        .login-card {
+            padding: 35px;
+            background: white;
+            border: 3px solid var(--navy);
+            border-radius: 24px;
+            box-shadow: 8px 9px 0 var(--navy);
+            animation: appear .6s ease-out;
+        }
+
+        .card-icon {
+            width: 58px;
+            height: 58px;
             display: grid;
             place-items: center;
-            border: 1px solid rgba(237,38,56,.4);
-            background: rgba(237,38,56,.08);
-            color: var(--red-light);
-            font-size: 23px;
-            box-shadow: 0 0 24px rgba(237,38,56,.1);
+            background: #eee9ff;
+            border: 2px solid var(--navy);
+            border-radius: 17px;
+            font-size: 31px;
+            margin-bottom: 20px;
         }
 
-        .card-kicker {
-            margin: 24px 0 7px;
-            color: var(--red-light);
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .auth-card h2 {
-            margin: 0;
-            font-family: 'Creepster', cursive;
-            font-size: 42px;
-            font-weight: 400;
-            letter-spacing: .5px;
+        .login-card h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 36px;
+            margin-bottom: 8px;
         }
 
         .card-description {
-            margin: 10px 0 25px;
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.7;
+            color: #77788d;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.6;
+            margin-bottom: 25px;
         }
 
-        .auth-error {
-            margin: 0 0 20px;
-            padding: 12px 14px;
-            border: 1px solid rgba(255,70,90,.38);
-            background: rgba(100,10,23,.3);
-            color: #ffb6bd;
-            font-size: 12px;
+        .error-message {
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            color: #a51f3e;
+            background: #ffe5ec;
+            border: 2px solid #ff9bb2;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
             line-height: 1.6;
         }
 
         .field {
-            margin-top: 20px;
+            margin-bottom: 19px;
         }
 
         .field label {
             display: block;
             margin-bottom: 8px;
-            color: #e7dfe1;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .input-wrap {
-            position: relative;
+            font-size: 13px;
+            font-weight: 900;
         }
 
         .field input {
             width: 100%;
             min-height: 49px;
-            padding: 13px 14px;
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 2px;
+            padding: 12px 14px;
+            border: 2px solid #deddea;
+            border-radius: 12px;
             outline: none;
-            background: rgba(0,0,0,.42);
-            color: #fff;
-            font: inherit;
-            font-size: 13px;
-            transition: border-color .2s, box-shadow .2s, background .2s;
-        }
-
-        .field input::placeholder {
-            color: #71676b;
+            background: #faf9ff;
+            color: var(--navy);
+            font-family: inherit;
+            font-size: 14px;
+            transition: .2s;
         }
 
         .field input:focus {
-            border-color: var(--red);
-            background: rgba(20,5,8,.75);
-            box-shadow: 0 0 0 3px rgba(237,38,56,.09);
+            border-color: var(--purple);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(115,87,232,.12);
         }
 
-        .password-input {
-            padding-right: 72px !important;
+        .field input::placeholder {
+            color: #a3a2b3;
+        }
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .password-wrap input {
+            padding-right: 70px;
         }
 
         .toggle-password {
             position: absolute;
+            right: 12px;
             top: 50%;
-            right: 10px;
             transform: translateY(-50%);
-            padding: 7px;
-            border: 0;
+            padding: 6px;
+            border: none;
             background: transparent;
-            color: #b9abad;
-            font: inherit;
-            font-size: 10px;
+            color: var(--purple);
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 900;
             cursor: pointer;
-        }
-
-        .toggle-password:hover {
-            color: #fff;
         }
 
         .submit-button {
             width: 100%;
-            min-height: 50px;
-            margin-top: 28px;
-            border: 1px solid var(--red);
-            border-radius: 2px;
-            background: var(--red);
-            color: #fff;
-            font: inherit;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            min-height: 52px;
+            margin-top: 8px;
+            border: 3px solid var(--navy);
+            border-radius: 13px;
+            background: var(--yellow);
+            color: var(--navy);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 900;
             cursor: pointer;
-            transition: background .25s, box-shadow .25s, transform .25s;
+            box-shadow: 4px 5px 0 var(--navy);
+            transition: .2s;
         }
 
         .submit-button:hover {
-            background: #c91629;
-            box-shadow: 0 0 28px rgba(237,38,56,.3);
-            transform: translateY(-1px);
+            transform: translate(2px, 2px);
+            box-shadow: 2px 3px 0 var(--navy);
+            background: #ffd95f;
         }
 
-        .submit-button:active {
-            transform: translateY(0);
-        }
-
-        .auth-footer {
-            margin: 24px 0 0;
+        .register-prompt {
+            margin-top: 24px;
             text-align: center;
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.8;
+            color: #77788d;
+            font-size: 13px;
+            font-weight: 800;
         }
 
-        .auth-footer a,
-        .back-link {
-            color: #ff7c87;
-            text-decoration: none;
-            transition: color .2s;
+        .register-prompt a {
+            color: var(--purple);
+            font-weight: 900;
         }
 
-        .auth-footer a {
+        .register-prompt a:hover {
+            color: var(--pink);
+        }
+
+        .security-note {
+            margin-top: 22px;
+            padding-top: 17px;
+            border-top: 2px dashed #e3e1ed;
+            text-align: center;
+            color: #85859a;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        footer {
+            padding: 23px;
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            font-size: 13px;
             font-weight: 700;
         }
 
-        .auth-footer a:hover,
-        .back-link:hover {
-            color: #fff;
+        footer span {
+            color: var(--yellow);
         }
 
-        .back-link {
-            position: relative;
-            z-index: 2;
-            color: #ddd0d3;
-            font-size: 11px;
-            letter-spacing: .5px;
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .card-bottom {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 25px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255,255,255,.09);
-            color: #817478;
-            font-size: 9px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            margin-right: 6px;
-            border-radius: 50%;
-            background: var(--red);
-            box-shadow: 0 0 9px var(--red);
-            animation: pulse 1.8s infinite;
-        }
-
-        .page-footer {
-            position: relative;
-            z-index: 2;
-            padding: 0 6% 20px;
-            color: rgba(230,220,222,.45);
-            text-align: center;
-            font-size: 10px;
-            letter-spacing: 1px;
-        }
-
-        @keyframes backgroundReveal {
-            from { opacity: .35; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slowZoom {
-            from { transform: scale(1.04); }
-            to { transform: scale(1.12); }
-        }
-
-        @keyframes fogDrift {
-            from { transform: translateX(-5%) translateY(0); opacity: .45; }
-            to { transform: translateX(5%) translateY(-12%); opacity: .85; }
-        }
-
-        @keyframes riseIn {
-            from { opacity: 0; transform: translateY(22px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes cardReveal {
-            from { opacity: 0; transform: translateY(20px) scale(.985); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .35; }
-        }
-
-        @media (max-width: 900px) {
-            .layout {
+        @media (max-width: 850px) {
+            .login-layout {
                 grid-template-columns: 1fr;
-                max-width: 560px;
-                gap: 35px;
-                padding-top: 30px;
+                max-width: 520px;
+                gap: 45px;
             }
 
-            .intro {
+            .welcome-section {
                 text-align: center;
             }
 
-            .eyebrow {
-                justify-content: center;
+            .welcome-section p {
+                margin-left: auto;
+                margin-right: auto;
             }
 
-            .intro h1 {
-                font-size: clamp(58px, 12vw, 85px);
-            }
-
-            .intro-copy {
-                margin-inline: auto;
-            }
-
-            .warning {
-                justify-content: center;
-            }
-
-            .auth-card {
-                padding: 30px;
+            .character-scene {
+                margin: 35px auto 0;
             }
         }
 
-        @media (max-width: 480px) {
-            .topbar {
-                padding: 20px;
+        @media (max-width: 500px) {
+            .navbar {
+                padding: 13px 5%;
             }
 
             .brand {
-                font-size: 25px;
+                font-size: 24px;
             }
 
-            .layout {
-                padding: 20px 18px 40px;
+            .login-layout {
+                padding: 38px 18px;
             }
 
-            .intro h1 {
-                font-size: 58px;
+            .welcome-section h1 {
+                font-size: 55px;
             }
 
-            .auth-card {
-                padding: 25px 20px;
+            .character-scene {
+                width: 220px;
+                height: 180px;
             }
 
-            .auth-card h2 {
-                font-size: 37px;
+            .character {
+                font-size: 105px;
             }
 
-            .card-bottom {
-                font-size: 8px;
+            .speech-bubble {
+                right: -25px;
+                font-size: 16px;
+            }
+
+            .login-card {
+                padding: 27px 21px;
+            }
+
+            .login-card h2 {
+                font-size: 31px;
             }
         }
 
@@ -593,383 +473,132 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             *, *::before, *::after {
                 animation-duration: .01ms !important;
                 animation-iteration-count: 1 !important;
-                scroll-behavior: auto !important;
             }
         }
     </style>
 </head>
 
 <body>
-    <canvas id="rain" aria-hidden="true"></canvas>
-    <div class="fog" aria-hidden="true"></div>
 
-    <header class="topbar">
-        <a class="brand" href="index.php">GHOST <span>HEIST</span></a>
+<header class="navbar">
+    <a href="index.php" class="brand">GHOST <span>HEIST</span> 🎭</a>
 
-        <button class="sound-button" id="soundToggle" type="button"
-                aria-pressed="false">
-            ♫ SOUND OFF
-        </button>
-    </header>
+    <a href="index.php" class="home-link">← Back to Home</a>
+</header>
 
-    <main class="layout">
-        <section class="intro">
-            <div class="eyebrow">The mansion remembers you</div>
+<main class="login-layout">
 
-            <h1>WELCOME <span>BACK</span></h1>
+    <section class="welcome-section">
+        <span class="welcome-tag">🥷 YOUR NEXT ADVENTURE</span>
 
-            <p class="intro-copy">
-                You know the way in. But do you remember the way out?
-                Return to the mansion, solve its mysteries, and claim the
-                treasure hidden beyond its locked doors.
-            </p>
+        <h1>
+            WELCOME<br>
+            <span>BACK!</span>
+        </h1>
 
-            <div class="warning">
-                <span class="warning-mark" aria-hidden="true">!</span>
-                <span>Every second inside brings another mystery.</span>
+        <p>
+            Your heist adventure is waiting! Log in, sneak past the guards,
+            solve tricky Banana puzzles and get one step closer to the treasure.
+        </p>
+
+        <div class="character-scene">
+            <span class="floating-star star-one">✨</span>
+            <span class="character">🥷</span>
+            <span class="speech-bubble">Psst... Ready?</span>
+            <span class="floating-star star-two">💰</span>
+        </div>
+    </section>
+
+    <section class="login-card">
+        <div class="card-icon">🔐</div>
+
+        <h2>Player Login</h2>
+
+        <p class="card-description">
+            Enter your account details to continue your adventure.
+        </p>
+
+        <?php if ($error !== ''): ?>
+            <div class="error-message" role="alert">
+                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
             </div>
-        </section>
+        <?php endif; ?>
 
-        <section class="auth-card" aria-labelledby="login-title">
-            <a class="back-link" href="index.php">
-                &larr; Return to the entrance
-            </a>
+        <form action="login.php" method="POST">
 
-            <div class="card-symbol" aria-hidden="true">☠</div>
+            <div class="field">
+                <label for="email">Email Address</label>
 
-            <p class="card-kicker">Identity verification</p>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    maxlength="100"
+                    autocomplete="username"
+                    placeholder="Enter your email"
+                    value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                    required
+                >
+            </div>
 
-            <h2 id="login-title">Enter the Mansion</h2>
+            <div class="field">
+                <label for="password">Password</label>
 
-            <p class="card-description">
-                Your next adventure is waiting. Identify yourself to continue.
-            </p>
-
-            <?php if ($error !== ''): ?>
-                <p class="auth-error" role="alert">
-                    <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
-                </p>
-            <?php endif; ?>
-
-            <form action="login.php" method="POST">
-                <div class="field">
-                    <label for="email">Email address</label>
-
+                <div class="password-wrap">
                     <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        maxlength="100"
-                        autocomplete="username"
-                        placeholder="you@example.com"
-                        value="<?= htmlspecialchars($_POST['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                        type="password"
+                        id="password"
+                        name="password"
+                        autocomplete="current-password"
+                        placeholder="Enter your password"
                         required
                     >
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        id="togglePassword"
+                        aria-pressed="false"
+                    >
+                        SHOW
+                    </button>
                 </div>
-
-                <div class="field">
-                    <label for="password">Password</label>
-
-                    <div class="input-wrap">
-                        <input
-                            class="password-input"
-                            type="password"
-                            id="password"
-                            name="password"
-                            autocomplete="current-password"
-                            placeholder="Enter your password"
-                            required
-                        >
-
-                        <button
-                            class="toggle-password"
-                            type="button"
-                            id="togglePassword"
-                            aria-pressed="false"
-                        >
-                            SHOW
-                        </button>
-                    </div>
-                </div>
-
-                <button class="submit-button" type="submit">
-                    Enter the Mansion &rarr;
-                </button>
-            </form>
-
-            <p class="auth-footer">
-                New to the mansion?
-                <a href="register.php">Create an account</a>
-            </p>
-
-            <div class="card-bottom">
-                <span><i class="status-dot"></i> Mansion online</span>
-                <span>Access is being monitored</span>
             </div>
-        </section>
-    </main>
 
-    <footer class="page-footer">
-        GHOST HEIST &bull; THINK FAST. TRUST NO SHADOW.
-    </footer>
+            <button type="submit" class="submit-button">
+                Let's Play! 🚀
+            </button>
 
-    <script>
-        // Animated rain
-        (() => {
-            const canvas = document.getElementById('rain');
-            const ctx = canvas.getContext('2d');
+        </form>
 
-            const reduceMotion = window.matchMedia(
-                '(prefers-reduced-motion: reduce)'
-            ).matches;
+        <p class="register-prompt">
+            Don't have an account?
+            <a href="register.php">Create one here</a>
+        </p>
 
-            let width = 0;
-            let height = 0;
-            let drops = [];
+        <div class="security-note">
+            🔒 Your player account is protected.
+        </div>
+    </section>
 
-            function resize() {
-                const ratio = Math.min(window.devicePixelRatio || 1, 2);
+</main>
 
-                width = window.innerWidth;
-                height = window.innerHeight;
+<footer>
+    © <?php echo date('Y'); ?> <span>Ghost Heist</span> · Sneak smart. Solve fast. Get rich!
+</footer>
 
-                canvas.width = width * ratio;
-                canvas.height = height * ratio;
-                canvas.style.width = width + 'px';
-                canvas.style.height = height + 'px';
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
 
-                ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    togglePassword.addEventListener('click', function () {
+        const showPassword = passwordInput.type === 'password';
 
-                drops = Array.from(
-                    { length: Math.min(Math.floor(width / 5), 260) },
-                    () => ({
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        length: 8 + Math.random() * 20,
-                        speed: 5 + Math.random() * 9
-                    })
-                );
-            }
+        passwordInput.type = showPassword ? 'text' : 'password';
+        togglePassword.textContent = showPassword ? 'HIDE' : 'SHOW';
+        togglePassword.setAttribute('aria-pressed', String(showPassword));
+    });
+</script>
 
-            function draw() {
-                ctx.clearRect(0, 0, width, height);
-                ctx.strokeStyle = 'rgba(190,195,210,.32)';
-                ctx.lineWidth = .7;
-                ctx.beginPath();
-
-                drops.forEach(drop => {
-                    ctx.moveTo(drop.x, drop.y);
-                    ctx.lineTo(drop.x - 2, drop.y + drop.length);
-
-                    drop.y += drop.speed;
-                    drop.x -= .8;
-
-                    if (drop.y > height) {
-                        drop.y = -drop.length;
-                        drop.x = Math.random() * width;
-                    }
-
-                    if (drop.x < 0) drop.x = width;
-                });
-
-                ctx.stroke();
-
-                if (!reduceMotion) {
-                    requestAnimationFrame(draw);
-                }
-            }
-
-            resize();
-            window.addEventListener('resize', resize);
-            draw();
-        })();
-
-        // Password visibility toggle
-        (() => {
-            const button = document.getElementById('togglePassword');
-            const password = document.getElementById('password');
-
-            button.addEventListener('click', () => {
-                const show = password.type === 'password';
-
-                password.type = show ? 'text' : 'password';
-                button.textContent = show ? 'HIDE' : 'SHOW';
-                button.setAttribute('aria-pressed', String(show));
-            });
-        })();
-
-        // Ambient horror sound
-        (() => {
-            const button = document.getElementById('soundToggle');
-
-            let audioContext = null;
-            let masterGain = null;
-            let soundNodes = [];
-            let isPlaying = false;
-            let stopping = false;
-
-            function cleanNodes(nodes) {
-                nodes.forEach(node => {
-                    try {
-                        if (typeof node.stop === 'function') node.stop();
-                    } catch (_) {}
-
-                    try {
-                        node.disconnect();
-                    } catch (_) {}
-                });
-            }
-
-            async function startSound() {
-                const AudioContextClass =
-                    window.AudioContext || window.webkitAudioContext;
-
-                if (!AudioContextClass) {
-                    button.textContent = 'AUDIO NOT SUPPORTED';
-                    return;
-                }
-
-                if (isPlaying || stopping) return;
-
-                try {
-                    if (!audioContext || audioContext.state === 'closed') {
-                        audioContext = new AudioContextClass();
-                    }
-
-                    await audioContext.resume();
-
-                    const now = audioContext.currentTime;
-
-                    masterGain = audioContext.createGain();
-                    masterGain.gain.setValueAtTime(0.0001, now);
-                    masterGain.gain.exponentialRampToValueAtTime(
-                        0.18, now + 1.5
-                    );
-                    masterGain.connect(audioContext.destination);
-
-                    // Layered eerie drone
-                    [65.41, 82.41, 110, 130.81, 164.81].forEach(
-                        (frequency, index) => {
-                            const oscillator = audioContext.createOscillator();
-                            const volume = audioContext.createGain();
-                            const filter = audioContext.createBiquadFilter();
-
-                            oscillator.type = index === 2 ? 'triangle' : 'sine';
-                            oscillator.frequency.value = frequency;
-                            volume.gain.value =
-                                [0.24, 0.17, 0.10, 0.07, 0.05][index];
-
-                            filter.type = 'lowpass';
-                            filter.frequency.value = 650;
-
-                            oscillator.connect(filter);
-                            filter.connect(volume);
-                            volume.connect(masterGain);
-                            oscillator.start();
-
-                            soundNodes.push(oscillator, volume, filter);
-                        }
-                    );
-
-                    // Slow atmospheric pulse
-                    const pulse = audioContext.createOscillator();
-                    const pulseDepth = audioContext.createGain();
-
-                    pulse.frequency.value = 0.14;
-                    pulseDepth.gain.value = 0.025;
-                    pulse.connect(pulseDepth);
-                    pulseDepth.connect(masterGain.gain);
-                    pulse.start();
-
-                    soundNodes.push(pulse, pulseDepth);
-
-                    // Soft wind noise
-                    const length = audioContext.sampleRate * 3;
-                    const noiseBuffer = audioContext.createBuffer(
-                        1, length, audioContext.sampleRate
-                    );
-                    const samples = noiseBuffer.getChannelData(0);
-
-                    for (let i = 0; i < length; i++) {
-                        samples[i] = Math.random() * 2 - 1;
-                    }
-
-                    const wind = audioContext.createBufferSource();
-                    const windFilter = audioContext.createBiquadFilter();
-                    const windVolume = audioContext.createGain();
-
-                    wind.buffer = noiseBuffer;
-                    wind.loop = true;
-
-                    windFilter.type = 'lowpass';
-                    windFilter.frequency.value = 700;
-                    windVolume.gain.value = 0.13;
-
-                    wind.connect(windFilter);
-                    windFilter.connect(windVolume);
-                    windVolume.connect(masterGain);
-                    wind.start();
-
-                    soundNodes.push(wind, windFilter, windVolume);
-
-                    isPlaying = true;
-                    button.textContent = '♫ SOUND ON';
-                    button.setAttribute('aria-pressed', 'true');
-                } catch (error) {
-                    console.error('Ghost Heist audio error:', error);
-
-                    cleanNodes(soundNodes);
-                    soundNodes = [];
-
-                    if (masterGain) {
-                        try {
-                            masterGain.disconnect();
-                        } catch (_) {}
-                    }
-
-                    masterGain = null;
-                    button.textContent = 'SOUND ERROR - TRY AGAIN';
-                }
-            }
-
-            function stopSound() {
-                if (!audioContext || !masterGain || !isPlaying) return;
-
-                isPlaying = false;
-                stopping = true;
-
-                const oldMaster = masterGain;
-                const oldNodes = soundNodes;
-                const now = audioContext.currentTime;
-
-                oldMaster.gain.cancelScheduledValues(now);
-                oldMaster.gain.setTargetAtTime(0.0001, now, 0.12);
-
-                masterGain = null;
-                soundNodes = [];
-
-                button.textContent = '♫ SOUND OFF';
-                button.setAttribute('aria-pressed', 'false');
-
-                window.setTimeout(() => {
-                    cleanNodes(oldNodes);
-
-                    try {
-                        oldMaster.disconnect();
-                    } catch (_) {}
-
-                    stopping = false;
-                }, 600);
-            }
-
-            button.addEventListener('click', () => {
-                if (isPlaying) {
-                    stopSound();
-                } else {
-                    startSound();
-                }
-            });
-        })();
-    </script>
 </body>
 </html>
