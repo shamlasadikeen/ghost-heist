@@ -777,6 +777,27 @@ footer {
     background: #8b70eb;
 }
 
+/* Ghost Heist - Room Frame Redesign */
+.game-container {
+    padding: 18px !important;
+    border: 8px solid #8b78d8 !important;
+    border-radius: 26px !important;
+    background: linear-gradient(135deg, #b9e8ff, #e8caff) !important;
+    box-sizing: border-box;
+    box-shadow:
+        0 0 0 5px #f5c4e8,
+        0 12px 30px rgba(55, 35, 100, 0.25) !important;
+}
+
+#gameCanvas {
+    inset: 18px !important;
+    width: calc(100% - 36px) !important;
+    height: calc(100% - 36px) !important;
+    border: 4px solid #ffffff;
+    border-radius: 14px;
+    box-sizing: border-box;
+}
+
 </style>
 </head>
 
@@ -814,7 +835,7 @@ footer {
 
         <div id="gameTimer">
             <span>TIME LEFT</span>
-            <strong id="timerValue">01:00</strong>
+            <strong id="timerValue">00:45</strong>
         </div>
 
         <canvas
@@ -973,6 +994,9 @@ const tryAgainButton = document.getElementById('tryAgainButton');
 
 let gameEnded = false;
 
+const timerValue = document.getElementById('timerValue');
+let timeRemaining = 45;
+
 function endGame(reason) {
     if (gameEnded) return;
 
@@ -1077,12 +1101,34 @@ const granny = {
 
 const grannyPatrolPoints = [
     { x: 430, y: 455 },
-    { x: 620, y: 455 },
-    { x: 620, y: 250 },
-    { x: 350, y: 250 }
+    { x: 520, y: 480 },
+    { x: 700, y: 480 },
+    { x: 700, y: 250 },
+    { x: 350, y: 250 },
+    { x: 350, y: 455 },
+    { x: 430, y: 455 }
 ];
 
 let grannyPatrolIndex = 1;
+
+// Granny's animated character sprites
+const grannySprites = {
+    down: [],
+    up: [],
+    left: [],
+    right: []
+};
+
+['down', 'up', 'left', 'right'].forEach(direction => {
+    [1, 2].forEach(frame => {
+        const sprite = new Image();
+
+        sprite.src =
+            `../assets/characters/player-postie/${direction}/frame_0${frame}.png`;
+
+        grannySprites[direction].push(sprite);
+    });
+});
 
 const spritePath =
     '../assets/characters/topdown-roster/topdown-roster-lite/sprites/';
@@ -1184,23 +1230,40 @@ function drawFallbackFloor() {
 
 function drawFloorLayer() {
 
-    if (!tilesLoaded) {
-        drawFallbackFloor();
-        return;
+    // Soft ivory floor.
+    ctx.fillStyle = '#fbfaf6';
+    ctx.fillRect(32, 32, 836, 536);
+
+    // Subtle pale floor tiles.
+    const tileSize = 48;
+
+    for (let y = 96; y < 536; y += tileSize) {
+        for (let x = 64; x < 836; x += tileSize) {
+
+            const alternate =
+                ((Math.floor(x / tileSize) +
+                  Math.floor(y / tileSize)) % 2) === 0;
+
+            ctx.fillStyle = alternate ? '#fffefa' : '#f6f5ef';
+            ctx.fillRect(x, y, tileSize, tileSize);
+        }
     }
 
-    for (let row = 0; row < GRID_ROWS; row++) {
+    ctx.strokeStyle = 'rgba(190, 190, 180, 0.28)';
+    ctx.lineWidth = 1;
 
-        for (let column = 0; column < GRID_COLUMNS; column++) {
+    for (let x = 64; x <= 836; x += tileSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 96);
+        ctx.lineTo(x, 536);
+        ctx.stroke();
+    }
 
-            drawTile(
-                floorMap[row][column],
-                12,
-                column * DRAW_TILE_SIZE,
-                row * DRAW_TILE_SIZE
-            );
-
-        }
+    for (let y = 96; y <= 536; y += tileSize) {
+        ctx.beginPath();
+        ctx.moveTo(64, y);
+        ctx.lineTo(836, y);
+        ctx.stroke();
     }
 }
 
@@ -1777,200 +1840,336 @@ function drawSideTable() {
 /* ==========================================
    COMPLETE LIVING ROOM
 ========================================== */
+function drawWallDecorations() {
 
-function drawLivingRoom() {
+    // Left wall picture frame.
+    roundedRect(245, 65, 95, 65, 5, '#70472e', '#422b20');
+    roundedRect(251, 71, 83, 53, 2, '#f5e7c8', '#b18a5b');
 
-    // Background floor.
-    drawFloorLayer();
+    // Picture landscape.
+    ctx.fillStyle = '#91b8a0';
+    ctx.fillRect(255, 75, 75, 45);
 
-    // Room structure.
-    drawWalls();
+    // Mountains.
+    ctx.fillStyle = '#62876d';
+    ctx.beginPath();
+    ctx.moveTo(255, 112);
+    ctx.lineTo(275, 84);
+    ctx.lineTo(293, 105);
+    ctx.lineTo(309, 86);
+    ctx.lineTo(330, 112);
+    ctx.closePath();
+    ctx.fill();
 
-    // Rug.
-    drawRug();
+    // Sun.
+    ctx.fillStyle = '#f2c66d';
+    ctx.beginPath();
+    ctx.arc(315, 85, 8, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Decorations.
-    drawPlant(790, 190, 1.05);
-    drawPlant(190, 405, 0.75);
-    drawFloorLamp();
 
-    // Furniture.
-    drawBookshelf();
-    drawSofa();
-    drawTelevision();
-    drawSideTable();
-    drawCoffeeTable();
-    drawArmchair();
+    // Wall clock.
+    ctx.fillStyle = '#70472e';
+    ctx.beginPath();
+    ctx.arc(510, 90, 23, 0, Math.PI * 2);
+    ctx.fill();
 
+    ctx.fillStyle = '#fff0d0';
+    ctx.beginPath();
+    ctx.arc(510, 90, 19, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#70472e';
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(510, 90);
+    ctx.lineTo(510, 77);
+    ctx.moveTo(510, 90);
+    ctx.lineTo(520, 95);
+    ctx.stroke();
+
+
+    // Small decorative wall shelf.
+    roundedRect(555, 125, 85, 9, 3, '#80502f', '#52331f');
+
+    // Small flower pot.
+    roundedRect(580, 105, 22, 19, 4, '#bd7650', '#80503a');
+
+    ctx.fillStyle = '#4d8052';
+    ctx.beginPath();
+    ctx.ellipse(585, 101, 7, 12, -0.5, 0, Math.PI * 2);
+    ctx.ellipse(598, 99, 7, 12, 0.5, 0, Math.PI * 2);
+    ctx.fill();
 }
 
 
 /* ==========================================
-   COMPLETE KITCHEN
+   NASHA SPRITE LOADER
+========================================== */
+
+const roomSpriteImages = {};
+
+const roomSpriteFiles = {
+    sofa: 'living_room/variants/three_seat_sofa__lavender.png',
+    sofa2: 'living_room/variants/three_seat_sofa__lavender.png',
+    armchair: 'living_room/armchair.png',
+    coffeeTable: 'living_room/low_coffee_table.png',
+    bookshelf: 'living_room/variants/tall_bookshelf_with_books__white_paint.png',
+    floorLamp: 'living_room/floor_lamp.png',
+    livingRug: 'living_room/variants/large_patterned_rug__baby_blue.png',
+    plant: 'living_room/potted_fiddle_leaf_fig.png',
+    monstera: 'living_room/potted_monstera_plant.png',
+    painting: 'living_room/framed_landscape_painting.png',
+    curtains: 'living_room/window_cream_curtains.png',
+    basket: 'living_room/basket_of_blankets.png',
+    pouf: 'living_room/variants/knitted_pouf__baby_blue.png',
+    books: 'living_room/stack_of_books.png',
+
+    fridge: 'kitchen/tall_cream_refrigerator_with_rounded_corners.png',
+    sink: 'kitchen/kitchen_counter_with_a_white_ceramic_sink.png',
+    stove: 'kitchen/kitchen_counter_with_a_four_burner_stove_top.png',
+    counter: 'kitchen/long_wooden_kitchen_counter_with_drawers.png',
+    island: 'kitchen/wooden_kitchen_island_with_a_butcher_block_top.png',
+    kitchenRug: 'kitchen/rag_rug_for_the_kitchen_floor.png',
+    table: 'kitchen/small_round_wooden_table.png',
+    chair: 'kitchen/wooden_chair_with_a_gingham_seat_cushion.png',
+    herbs: 'kitchen/tall_potted_herb_stand_with_three_shelves_of_herbs.png',
+    hutch: 'kitchen/tall_kitchen_hutch_with_plates_on_its_open_shelves.png',
+    shelf: 'kitchen/long_wall_shelf_with_mugs_hanging_below.png',
+    toaster: 'kitchen/toaster_with_toast_popping_up.png',
+    bread: 'kitchen/bread_bin.png',
+
+    roundRug: 'decor/round_braided_rug.png',
+    lantern: 'decor/candle_lantern.png',
+    fern: 'decor/potted_fern.png',
+    flowers: 'decor/vase_of_daisies.png',
+    wardrobe: 'bedroom/wardrobe.png',
+    bedroomRug: 'bedroom/fringed_bedroom_rug.png'
+};
+
+Object.entries(roomSpriteFiles).forEach(([name, file]) => {
+    const img = new Image();
+    img.src = '../assets/sprites/' + file;
+    roomSpriteImages[name] = img;
+});
+
+function drawRoomSprite(name, x, y, width, height) {
+    const img = roomSpriteImages[name];
+
+    if (!img || !img.complete || !img.naturalWidth) {
+        return;
+    }
+
+    const scale = Math.min(
+        width / img.naturalWidth,
+        height / img.naturalHeight
+    );
+
+    const drawWidth = img.naturalWidth * scale;
+    const drawHeight = img.naturalHeight * scale;
+
+    ctx.drawImage(
+        img,
+        x + (width - drawWidth) / 2,
+        y + (height - drawHeight) / 2,
+        drawWidth,
+        drawHeight
+    );
+}
+
+
+/* ==========================================
+   LIVING ROOM
+========================================== */
+
+function drawLivingRoom() {
+
+    drawFloorLayer();
+    drawWalls();
+
+    // Large baby-blue carpet anchors the seating area.
+    drawRoomSprite('livingRug', 235, 275, 430, 203);
+
+    // TV on the top wall, facing the seating area.
+    drawShadow(380, 98, 140, 76, 9);
+    roundedRect(380, 98, 140, 76, 9, '#eee8f7', '#a58bbd');
+    roundedRect(389, 106, 122, 56, 5, '#343b55', '#c5b4d9');
+
+    ctx.fillStyle = '#bce9fa';
+    ctx.fillRect(396, 113, 108, 42);
+
+    ctx.fillStyle = '#fff0ad';
+    ctx.beginPath();
+    ctx.arc(450, 134, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Matching lavender sofas, arranged as one seating zone.
+    drawRoomSprite('sofa', 115, 160, 245, 110);
+    drawRoomSprite('sofa2', 540, 160, 245, 110);
+
+    // Central coffee table on the carpet.
+    drawRoomSprite('coffeeTable', 365, 325, 160, 86);
+
+    // White bookshelf along the left wall.
+    drawRoomSprite('bookshelf', 75, 285, 110, 175);
+
+    // A cosy reading corner.
+    drawRoomSprite('floorLamp', 735, 265, 48, 120);
+    drawRoomSprite('pouf', 570, 390, 78, 70);
+
+    // Plants grouped near the room edges.
+    drawRoomSprite('plant', 75, 135, 65, 90);
+    drawRoomSprite('monstera', 755, 385, 65, 75);
+
+    // Wall decoration and small finishing touches.
+    drawRoomSprite('curtains', 190, 75, 115, 95);
+    drawRoomSprite('painting', 585, 75, 90, 75);
+    drawRoomSprite('basket', 210, 430, 65, 60);
+    drawRoomSprite('books', 405, 290, 45, 40);
+}
+
+
+/* ==========================================
+   KITCHEN
 ========================================== */
 
 function drawKitchen() {
 
-    // Kitchen floor.
-    ctx.fillStyle = '#e9dfc9';
-    ctx.fillRect(0, 0, 900, 600);
-
-    // Floor tiles.
-    ctx.strokeStyle = 'rgba(160, 145, 120, 0.25)';
-    ctx.lineWidth = 2;
-
-    for (let x = 35; x < 870; x += 55) {
-        ctx.beginPath();
-        ctx.moveTo(x, 100);
-        ctx.lineTo(x, 535);
-        ctx.stroke();
-    }
-
-    for (let y = 105; y < 535; y += 55) {
-        ctx.beginPath();
-        ctx.moveTo(35, y);
-        ctx.lineTo(865, y);
-        ctx.stroke();
-    }
-
-    // Room walls.
+    drawFloorLayer();
     drawWalls();
 
-    // Back kitchen cabinets.
-    roundedRect(90, 105, 700, 100, 12, '#a85e38', '#693a27');
+    // Kitchen rug.
+    drawRoomSprite('kitchenRug', 330, 450, 230, 80);
 
-    // Cabinet doors.
-    for (let x = 105; x < 770; x += 95) {
-        roundedRect(x, 120, 80, 68, 6, '#e9b879', '#80502f');
-        ctx.fillStyle = '#80502f';
-        ctx.beginPath();
-        ctx.arc(x + 68, 154, 4, 0, Math.PI * 2);
-        ctx.fill();
-    }
+    // Back counter and kitchen worktops.
+    drawRoomSprite('sink', 80, 105, 170, 105);
+    drawRoomSprite('counter', 235, 105, 300, 105);
+    drawRoomSprite('stove', 610, 105, 185, 105);
 
-    // Countertop.
-    roundedRect(78, 96, 724, 22, 6, '#f4f0e7', '#a28e78');
-
-    // Refrigerator.
-    roundedRect(90, 235, 115, 205, 12, '#dce8ed', '#71828a');
-    roundedRect(99, 244, 97, 85, 7, '#f5fafb', '#9aaeb5');
-    roundedRect(99, 335, 97, 94, 7, '#f5fafb', '#9aaeb5');
-
-    ctx.fillStyle = '#71828a';
-    roundedRect(185, 265, 5, 48, 3, '#71828a');
-    roundedRect(185, 350, 5, 48, 3, '#71828a');
-
-    // Stove and oven.
-    roundedRect(625, 235, 165, 170, 10, '#d6d9d8', '#707979');
-    roundedRect(640, 248, 135, 95, 7, '#f5f5f0', '#858b89');
-
-    // Stove burners.
-    const burners = [
-        [670, 276], [745, 276],
-        [670, 316], [745, 316]
-    ];
-
-    burners.forEach(([x, y]) => {
-        ctx.beginPath();
-        ctx.arc(x, y, 13, 0, Math.PI * 2);
-        ctx.fillStyle = '#454b4b';
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = '#aeb5b2';
-        ctx.fill();
-    });
-
-    // Oven window.
-    roundedRect(646, 355, 122, 38, 5, '#41494b', '#7a8585');
+    // Kitchen appliances.
+    drawRoomSprite('fridge', 85, 225, 120, 215);
 
     // Kitchen island.
-    roundedRect(300, 315, 260, 125, 14, '#9b5935', '#633a27');
-    roundedRect(290, 300, 280, 32, 10, '#f4f0e7', '#a28e78');
+    drawRoomSprite('island', 290, 300, 280, 145);
 
-    // Fruit bowl.
-    ctx.beginPath();
-    ctx.ellipse(430, 286, 45, 13, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#b96c32';
-    ctx.fill();
+    // Small kitchen decorations.
+    drawRoomSprite('shelf', 345, 70, 180, 90);
+    drawRoomSprite('herbs', 780, 220, 65, 135);
+    drawRoomSprite('hutch', 690, 240, 100, 160);
 
-    // Fruits.
-    const fruits = [
-        [415, 278, '#d94a37'],
-        [435, 274, '#e6b83f'],
-        [450, 280, '#5c9b50']
-    ];
+    // Table and chairs.
+    drawRoomSprite('table', 620, 395, 100, 90);
+    drawRoomSprite('chair', 570, 390, 65, 85);
+    drawRoomSprite('chair', 705, 390, 65, 85);
 
-    fruits.forEach(([x, y, color]) => {
-        ctx.beginPath();
-        ctx.arc(x, y, 10, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-    });
-
-    // Kitchen rug.
-    roundedRect(330, 465, 210, 48, 8, '#8bb5a2', '#527d6a');
-
-    // Rug stripes.
-    ctx.strokeStyle = '#e9dfc9';
-    ctx.lineWidth = 4;
-
-    for (let x = 350; x < 530; x += 25) {
-        ctx.beginPath();
-        ctx.moveTo(x, 470);
-        ctx.lineTo(x, 508);
-        ctx.stroke();
-    }
-
-    // Small wall clock.
-    ctx.beginPath();
-    ctx.arc(450, 68, 20, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff5df';
-    ctx.fill();
-    ctx.strokeStyle = '#80502f';
-    ctx.lineWidth = 4;
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(450, 68);
-    ctx.lineTo(450, 55);
-    ctx.moveTo(450, 68);
-    ctx.lineTo(460, 73);
-    ctx.stroke();
+    // Small objects.
+    drawRoomSprite('toaster', 535, 155, 55, 55);
+    drawRoomSprite('bread', 260, 155, 55, 45);
 }
 
 
+/* ==========================================
+   TREASURE ROOM
+========================================== */
+
+function drawTreasureRoom() {
+
+    drawFloorLayer();
+    drawWalls();
+
+    // Decorative treasure-room floor.
+    drawRoomSprite('bedroomRug', 290, 365, 330, 155);
+    drawRoomSprite('roundRug', 590, 400, 190, 110);
+
+    // Furniture and decorations.
+    drawRoomSprite('wardrobe', 85, 205, 110, 210);
+    drawRoomSprite('bookshelf', 700, 170, 90, 150);
+    drawRoomSprite('lantern', 235, 245, 65, 90);
+    drawRoomSprite('fern', 790, 180, 65, 95);
+    drawRoomSprite('flowers', 440, 175, 65, 65);
+
+    // Treasure chest glow.
+    const glow = ctx.createRadialGradient(
+        755, 450, 15,
+        755, 450, 125
+    );
+
+    glow.addColorStop(0, 'rgba(255, 221, 105, 0.48)');
+    glow.addColorStop(1, 'rgba(255, 221, 105, 0)');
+
+    ctx.fillStyle = glow;
+    ctx.fillRect(610, 320, 290, 250);
+
+    // Chest shadow.
+    drawShadow(665, 410, 175, 110, 18);
+
+    // Chest body.
+    roundedRect(680, 430, 150, 75, 12, '#a85e35', '#63351e');
+
+    // Golden front panel.
+    roundedRect(691, 443, 128, 49, 7, '#c47a39', '#f6c65d');
+
+    // Chest lid.
+    roundedRect(670, 397, 170, 49, 17, '#754324', '#4d2a19');
+
+    // Golden lid trim.
+    roundedRect(680, 405, 150, 10, 4, '#f4c65d', '#9b681f');
+
+    // Golden chest bands.
+    roundedRect(704, 430, 12, 75, 3, '#f7d66e');
+    roundedRect(795, 430, 12, 75, 3, '#f7d66e');
+
+    // Lock.
+    roundedRect(740, 443, 30, 35, 7, '#f5d46b', '#98671e');
+
+    ctx.fillStyle = '#71451f';
+    ctx.beginPath();
+    ctx.arc(755, 457, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Coins.
+    ctx.fillStyle = '#ffdf65';
+
+    [[700, 424], [720, 417], [790, 421], [810, 425]].forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.fill();
+    });
+
+    ctx.fillStyle = '#fff4ad';
+    ctx.font = 'bold 19px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('TREASURE', 755, 545);
+}
 /* ==========================================
    FURNITURE COLLISION
 ========================================== */
 
 const obstacles = [
-    // Sofa.
-    {x: 125, y: 135, w: 235, h: 112},
 
-    // Bookshelf.
-    {x: 78, y: 276, w: 82, h: 156},
+    // Left lavender sofa.
+    { x: 125, y: 175, w: 225, h: 85 },
 
-    // TV cabinet and television.
-    {x: 655, y: 76, w: 158, h: 102},
+    // Right lavender sofa.
+    { x: 550, y: 175, w: 225, h: 85 },
 
-    // Side table.
-    {x: 390, y: 150, w: 75, h: 55},
+    // TV.
+    { x: 385, y: 100, w: 130, h: 65 },
 
-    // Coffee table.
-    {x: 390, y: 310, w: 150, h: 80},
+    // Central coffee table.
+    { x: 375, y: 335, w: 140, h: 65 },
 
-    // Armchair.
-    {x: 665, y: 310, w: 112, h: 105},
+    // White bookshelf.
+    { x: 80, y: 295, w: 95, h: 155 },
 
     // Floor lamp base.
-    {x: 564, y: 210, w: 42, h: 22},
+    { x: 745, y: 350, w: 28, h: 22 },
 
-    
     // Plants.
-    {x: 770, y: 180, w: 40, h: 40},
-    {x: 175, y: 395, w: 30, h: 30}
+    { x: 85, y: 155, w: 40, h: 45 },
+    { x: 765, y: 400, w: 40, h: 40 }
+
 ];
 
 
@@ -1998,12 +2197,26 @@ const kitchenObstacles = [
 
 
 /* ==========================================
+   EXTRA LIVING ROOM COLLISION OBJECTS
+========================================== */
+
+const livingRoomExtraObstacles = [
+
+    // Baby-blue knitted pouf.
+    { x: 570, y: 390, w: 78, h: 70 },
+
+    // Basket of blankets.
+    { x: 210, y: 430, w: 65, h: 60 }
+
+];
+
+/* ==========================================
    GAME OBJECTS
 ========================================== */
 
 const sparklingObject = {
-    x: currentRoom === 2 ? 240 : 755,
-    y: currentRoom === 2 ? 250 : 475
+    x: currentRoom === 2 ? 840 : 755,
+    y: currentRoom === 2 ? 180 : 475
 };
 
 const INTERACTION_DISTANCE = 70;
@@ -2131,7 +2344,11 @@ function collides(x, y) {
     const roomObstacles =
     currentRoom === 2 ? kitchenObstacles : obstacles;
 
-    return roomObstacles.some(obstacle =>
+    const allObstacles = currentRoom === 1
+        ? [...roomObstacles, ...livingRoomExtraObstacles]
+        : roomObstacles;
+
+    return allObstacles.some(obstacle =>
 
         x + r > obstacle.x &&
         x - r < obstacle.x + obstacle.w &&
@@ -2179,6 +2396,25 @@ function checkGrannyDetection() {
     }
 }
 function update(delta) {
+
+    // Countdown timer
+    if (!gameEnded) {
+        timeRemaining = Math.max(0, timeRemaining - delta);
+
+        const seconds = Math.ceil(timeRemaining);
+
+        timerValue.textContent =
+            '00:' + String(seconds).padStart(2, '0');
+
+        if (timeRemaining <= 0) {
+            timerValue.textContent = '00:00';
+            endGame('Time is up! Try again.');
+            return;
+        }
+    }
+
+    // Stop gameplay after Game Over
+    if (gameEnded) return;
 
     player.isMoving = false;
 
@@ -2268,49 +2504,144 @@ if (gameEnded) {
    SPARKLING OBJECT
 ========================================== */
 
+
+
+
 function drawSparkle() {
 
-    const pulse = 1 + Math.sin(animationTime * 5) * 0.15;
+    const pulse = 1 + Math.sin(animationTime * 3) * 0.035;
+    const floatY = Math.sin(animationTime * 2.5) * 3;
 
     ctx.save();
 
-    ctx.translate(sparklingObject.x, sparklingObject.y);
+    ctx.translate(
+        sparklingObject.x,
+        sparklingObject.y + floatY
+    );
+
     ctx.scale(pulse, pulse);
 
-    ctx.fillStyle = '#ffe65b';
-    ctx.shadowColor = '#ffca28';
-    ctx.shadowBlur = 25;
+    // Small glossy transparent water bubble
+    const bubbleGradient = ctx.createRadialGradient(
+        -9, -13, 2,
+        0, 0, 27
+    );
+
+    bubbleGradient.addColorStop(0, 'rgba(255,255,255,0.42)');
+    bubbleGradient.addColorStop(0.55, 'rgba(120,220,255,0.10)');
+    bubbleGradient.addColorStop(1, 'rgba(80,180,255,0.22)');
+
+    ctx.shadowColor = '#75dfff';
+    ctx.shadowBlur = 12;
 
     ctx.beginPath();
-    ctx.arc(0, 0, 15, 0, Math.PI * 2);
+    ctx.arc(0, 0, 25, 0, Math.PI * 2);
+    ctx.fillStyle = bubbleGradient;
     ctx.fill();
 
     ctx.shadowBlur = 0;
 
+    // Bubble outline
+    ctx.strokeStyle = 'rgba(190,240,255,0.95)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Smaller wooden key
+    ctx.save();
+    ctx.scale(0.7, 0.7);
+
+    const woodGradient = ctx.createLinearGradient(
+        -12, -20, 12, 22
+    );
+
+    woodGradient.addColorStop(0, '#f2c27a');
+    woodGradient.addColorStop(0.5, '#a96732');
+    woodGradient.addColorStop(1, '#70401f');
+
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Key handle
     ctx.beginPath();
+    ctx.arc(0, -12, 11, 0, Math.PI * 2);
+    ctx.strokeStyle = '#63391f';
+    ctx.lineWidth = 9;
+    ctx.stroke();
 
-    for (let i = 0; i < 8; i++) {
+    ctx.beginPath();
+    ctx.arc(0, -12, 11, 0, Math.PI * 2);
+    ctx.strokeStyle = woodGradient;
+    ctx.lineWidth = 6;
+    ctx.stroke();
 
-        const angle = (Math.PI / 4) * i - Math.PI / 2;
-        const radius = i % 2 === 0 ? 12 : 5;
+    // Key shaft
+    ctx.beginPath();
+    ctx.moveTo(0, -1);
+    ctx.lineTo(0, 21);
+    ctx.strokeStyle = '#63391f';
+    ctx.lineWidth = 9;
+    ctx.stroke();
 
-        const x = Math.cos(angle) * radius;
-        const y = Math.sin(angle) * radius;
+    ctx.beginPath();
+    ctx.moveTo(0, -1);
+    ctx.lineTo(0, 21);
+    ctx.strokeStyle = woodGradient;
+    ctx.lineWidth = 6;
+    ctx.stroke();
 
-        if (i === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-    }
+    // Key teeth
+    ctx.beginPath();
+    ctx.moveTo(0, 10);
+    ctx.lineTo(9, 10);
+    ctx.lineTo(9, 16);
 
-    ctx.closePath();
+    ctx.moveTo(0, 20);
+    ctx.lineTo(-8, 20);
 
+    ctx.strokeStyle = '#70401f';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    // Wooden texture
+    ctx.beginPath();
+    ctx.moveTo(-3, 3);
+    ctx.lineTo(-3, 7);
+
+    ctx.moveTo(3, 13);
+    ctx.lineTo(3, 17);
+
+    ctx.strokeStyle = 'rgba(255,220,160,0.65)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.restore();
+
+    // Bubble reflections
+    ctx.beginPath();
+    ctx.ellipse(-16, -16, 3, 6, -0.6, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(17, 12, 2, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fill();
+
+    // Small floating highlights
     ctx.fillStyle = '#ffffff';
+
+    ctx.beginPath();
+    ctx.arc(-20, 3, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(19, -16, 1.5, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();
 }
+
+
 
 function drawGranny() {
 
@@ -2319,7 +2650,7 @@ function drawGranny() {
 
     ctx.save();
 
-    // Granny's vision cone
+    // Draw Granny's vision cone
     ctx.fillStyle = 'rgba(255, 60, 60, 0.18)';
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -2335,48 +2666,48 @@ function drawGranny() {
     ctx.closePath();
     ctx.fill();
 
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    // Character shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
     ctx.beginPath();
-    ctx.ellipse(x, y + 13, 17, 7, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y + 25, 19, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Dress
-    ctx.fillStyle = '#49304f';
-    ctx.beginPath();
-    ctx.ellipse(x, y + 5, 14, 17, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // Determine walking direction from Granny's patrol angle
+    const horizontal = Math.cos(granny.angle);
+    const vertical = Math.sin(granny.angle);
 
-    // Face
-    ctx.fillStyle = '#f0c6a5';
-    ctx.beginPath();
-    ctx.arc(x, y - 13, 10, 0, Math.PI * 2);
-    ctx.fill();
+    let direction;
 
-    // Grey hair
-    ctx.fillStyle = '#d5d2d0';
-    ctx.beginPath();
-    ctx.arc(x, y - 19, 10, Math.PI, Math.PI * 2);
-    ctx.fill();
+    if (Math.abs(horizontal) > Math.abs(vertical)) {
+        direction = horizontal > 0 ? 'right' : 'left';
+    } else {
+        direction = vertical > 0 ? 'down' : 'up';
+    }
 
-    // Hair bun
-    ctx.beginPath();
-    ctx.arc(x + 7, y - 23, 5, 0, Math.PI * 2);
-    ctx.fill();
+    // Alternate between the two walking frames
+    const frameIndex = Math.floor(animationTime * 6) % 2;
 
-    // Eyes
-    ctx.fillStyle = '#25202a';
-    ctx.beginPath();
-    ctx.arc(x - 4, y - 14, 1.5, 0, Math.PI * 2);
-    ctx.arc(x + 4, y - 14, 1.5, 0, Math.PI * 2);
-    ctx.fill();
+    const sprite = grannySprites[direction][frameIndex];
 
-    // Mouth
-    ctx.strokeStyle = '#8b4141';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(x, y - 8, 3, 0, Math.PI);
-    ctx.stroke();
+    if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+
+        ctx.drawImage(
+            sprite,
+            x - 32,
+            y - 32,
+            64,
+            64
+        );
+
+    } else {
+
+        // Temporary fallback while the image loads
+        ctx.fillStyle = '#49304f';
+        ctx.beginPath();
+        ctx.arc(x, y, 15, 0, Math.PI * 2);
+        ctx.fill();
+
+    }
 
     ctx.restore();
 }
@@ -2430,10 +2761,10 @@ function drawPlayer() {
         0,
         16,
         16,
-        x - 24,
-        y - 28,
-        48,
-        48
+        x - 27,
+        y - 35,
+        54,
+        58
     );
 }
 
@@ -2689,7 +3020,7 @@ function drawRoom() {
         drawKitchen();
     } 
     else if (currentRoom === 3) {
-        drawKitchen(); // Temporary until we design the treasure room.
+        drawTreasureRoom();
     }
 
 }

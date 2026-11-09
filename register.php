@@ -62,484 +62,478 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080607">
+    <meta name="theme-color" content="#fff7e8">
     <title>Join the Heist | Ghost Heist</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --red: #ed2638;
-            --red-light: #ff5260;
-            --bg: #080607;
-            --text: #f7f1f1;
-            --muted: #b9abad;
-            --panel: rgba(15, 10, 12, .84);
+            --purple: #7046c8;
+            --purple-dark: #50309b;
+            --yellow: #ffca45;
+            --pink: #ff7896;
+            --blue: #72c8ed;
+            --ink: #29213e;
+            --muted: #777187;
+            --cream: #fff7e8;
         }
 
-        * { box-sizing: border-box; }
-
-        html {
-            min-height: 100%;
-            background: var(--bg);
+        * {
+            box-sizing: border-box;
         }
 
         body {
             margin: 0;
             min-height: 100vh;
-            color: var(--text);
-            background: var(--bg);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Nunito', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 18%, #ffe4a3 0 8%, transparent 8.2%),
+                radial-gradient(circle at 88% 75%, #e6d8ff 0 11%, transparent 11.2%),
+                var(--cream);
             overflow-x: hidden;
         }
 
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            background:
-                linear-gradient(90deg, rgba(5,4,5,.82), rgba(5,4,5,.35)),
-                linear-gradient(0deg, #080607 0%, transparent 45%, rgba(0,0,0,.38)),
-                url("https://images.unsplash.com/photo-1657265514497-02611707af59?auto=format&fit=crop&fm=jpg&q=85&w=2400")
-                center 55% / cover no-repeat;
-            transform: scale(1.04);
-            animation: backgroundReveal 2s ease-out both,
-                       slowZoom 24s ease-in-out infinite alternate;
-        }
-
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            background:
-                radial-gradient(ellipse at 75% 45%, transparent 5%, rgba(5,3,5,.35) 70%),
-                radial-gradient(ellipse at 15% 90%, rgba(112,0,12,.22), transparent 45%),
-                repeating-linear-gradient(
-                    105deg,
-                    transparent 0 90px,
-                    rgba(255,255,255,.018) 91px,
-                    transparent 92px 160px
-                );
-        }
-
-        #rain {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: .24;
-        }
-
-        .fog {
-            position: fixed;
-            z-index: 1;
-            left: -20%;
-            bottom: -20%;
-            width: 140%;
-            height: 45%;
-            pointer-events: none;
-            background: radial-gradient(ellipse, rgba(175,168,174,.13), transparent 65%);
-            filter: blur(32px);
-            animation: fogDrift 18s ease-in-out infinite alternate;
+        a {
+            text-decoration: none;
         }
 
         .topbar {
-            position: relative;
-            z-index: 3;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 25px 6%;
+            padding: 22px 6%;
         }
 
         .brand {
-            color: #fff;
-            font-family: 'Creepster', cursive;
+            color: var(--purple);
+            font-family: 'Fredoka', sans-serif;
             font-size: 30px;
-            letter-spacing: 2px;
-            text-decoration: none;
-            text-shadow: 0 0 18px rgba(237,38,56,.5);
+            font-weight: 700;
+            letter-spacing: -1px;
         }
 
-        .brand span { color: var(--red); }
-
-        .sound-button {
-            border: 1px solid rgba(255,255,255,.2);
-            border-radius: 30px;
-            padding: 10px 15px;
-            color: #eee;
-            background: rgba(0,0,0,.55);
-            font: inherit;
-            font-size: 12px;
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-            transition: .25s;
+        .brand span {
+            color: #ff8a45;
         }
 
-        .sound-button:hover {
-            border-color: var(--red);
-            box-shadow: 0 0 20px rgba(237,38,56,.18);
+        .top-link {
+            color: var(--purple-dark);
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .top-link:hover {
+            color: var(--pink);
         }
 
         .layout {
-            position: relative;
-            z-index: 2;
-            min-height: calc(100vh - 85px);
+            width: min(1100px, 90%);
+            min-height: calc(100vh - 90px);
+            margin: auto;
+            padding: 25px 0 55px;
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(340px, 440px);
+            grid-template-columns: 1fr 430px;
             align-items: center;
-            gap: clamp(35px, 7vw, 110px);
-            max-width: 1350px;
-            margin: 0 auto;
-            padding: 25px 6% 65px;
+            gap: 65px;
         }
 
         .intro {
-            max-width: 650px;
-            animation: riseIn .9s .1s both;
+            animation: appear .7s ease both;
         }
 
-        .eyebrow {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--red-light);
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        .eyebrow::before {
-            content: "";
-            width: 32px;
-            height: 1px;
-            background: var(--red);
-            box-shadow: 0 0 10px var(--red);
+        .intro-label {
+            display: inline-block;
+            padding: 9px 17px;
+            border: 2px solid var(--ink);
+            border-radius: 30px;
+            background: var(--yellow);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            transform: rotate(-3deg);
         }
 
         .intro h1 {
-            margin: 20px 0;
-            font-family: 'Creepster', cursive;
-            font-size: clamp(64px, 8vw, 112px);
-            font-weight: 400;
-            line-height: .92;
-            letter-spacing: 1px;
-            text-shadow: 0 4px 30px rgba(0,0,0,.8);
+            margin: 24px 0 16px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(55px, 7vw, 85px);
+            font-weight: 700;
+            line-height: .98;
+            letter-spacing: -3px;
         }
 
         .intro h1 span {
             display: block;
-            color: var(--red);
-            text-shadow: 0 0 30px rgba(237,38,56,.28);
+            color: var(--purple);
         }
 
         .intro-copy {
-            max-width: 470px;
-            color: #d0c5c8;
-            font-size: 15px;
+            max-width: 440px;
+            color: var(--muted);
+            font-size: 16px;
             line-height: 1.9;
+            font-weight: 700;
         }
 
-        .warning {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 30px;
-            color: #c3b6b9;
-            font-size: 11px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+        .cartoon-scene {
+            position: relative;
+            width: min(100%, 390px);
+            height: 235px;
+            margin-top: 32px;
+            border: 3px solid var(--ink);
+            border-radius: 25px;
+            background: #bdeaff;
+            box-shadow: 7px 8px 0 var(--ink);
+            overflow: hidden;
         }
 
-        .warning-mark {
-            display: grid;
-            place-items: center;
-            width: 34px;
-            height: 34px;
-            flex-shrink: 0;
-            border: 1px solid rgba(237,38,56,.5);
-            color: var(--red-light);
-            background: rgba(237,38,56,.08);
-            font-size: 17px;
+        .scene-window {
+            position: absolute;
+            top: 22px;
+            right: 25px;
+            width: 105px;
+            height: 95px;
+            border: 4px solid var(--ink);
+            border-radius: 13px;
+            background: #fff5c6;
+        }
+
+        .scene-window::before,
+        .scene-window::after {
+            content: "";
+            position: absolute;
+            background: var(--ink);
+        }
+
+        .scene-window::before {
+            width: 4px;
+            height: 100%;
+            left: 50%;
+        }
+
+        .scene-window::after {
+            width: 100%;
+            height: 4px;
+            top: 50%;
+        }
+
+        .scene-floor {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 55px;
+            background: #f4b875;
+            border-top: 4px solid var(--ink);
+        }
+
+        .scene-door {
+            position: absolute;
+            bottom: 55px;
+            left: 35px;
+            width: 70px;
+            height: 115px;
+            border: 4px solid var(--ink);
+            border-radius: 12px 12px 0 0;
+            background: #9a72d9;
+        }
+
+        .scene-door::after {
+            content: "";
+            position: absolute;
+            top: 52%;
+            right: 9px;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--yellow);
+            border: 2px solid var(--ink);
+        }
+
+        .cartoon-character {
+            position: absolute;
+            bottom: 32px;
+            left: 135px;
+            z-index: 2;
+            font-size: 78px;
+            filter: drop-shadow(3px 4px 0 rgba(41,33,62,.15));
+            animation: bob 2s ease-in-out infinite;
+        }
+
+        .scene-star {
+            position: absolute;
+            top: 22px;
+            left: 135px;
+            color: #ffad35;
+            font-size: 32px;
+            animation: bob 2.5s ease-in-out infinite;
+        }
+
+        .scene-caption {
+            position: absolute;
+            right: 15px;
+            bottom: 12px;
+            z-index: 3;
+            padding: 6px 11px;
+            border: 2px solid var(--ink);
+            border-radius: 20px;
+            background: white;
+            font-size: 10px;
+            font-weight: 900;
+            transform: rotate(-3deg);
         }
 
         .auth-card {
-            position: relative;
-            padding: 35px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 5px;
-            background: var(--panel);
-            box-shadow:
-                0 30px 100px rgba(0,0,0,.65),
-                0 0 45px rgba(112,0,12,.1),
-                inset 0 1px rgba(255,255,255,.05);
-            backdrop-filter: blur(18px);
-            animation: cardReveal 1s .15s both;
+            padding: 34px;
+            border: 3px solid var(--ink);
+            border-radius: 27px;
+            background: #fff;
+            box-shadow: 9px 10px 0 var(--ink);
+            animation: appear .8s .1s ease both;
         }
 
-        .auth-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--red), transparent);
-            box-shadow: 0 0 20px rgba(237,38,56,.65);
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .card-symbol {
-            width: 48px;
-            height: 48px;
+        .card-icon {
             display: grid;
             place-items: center;
-            border: 1px solid rgba(237,38,56,.4);
-            background: rgba(237,38,56,.08);
-            color: var(--red-light);
-            font-size: 23px;
-            box-shadow: 0 0 24px rgba(237,38,56,.1);
+            width: 54px;
+            height: 54px;
+            border: 2px solid var(--ink);
+            border-radius: 17px;
+            background: var(--yellow);
+            font-size: 28px;
+            transform: rotate(-5deg);
         }
 
-        .card-kicker {
-            margin: 24px 0 7px;
-            color: var(--red-light);
+        .card-tag {
+            padding: 7px 12px;
+            border-radius: 20px;
+            background: #f0e9ff;
+            color: var(--purple);
             font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: .7px;
         }
 
         .auth-card h2 {
-            margin: 0;
-            font-family: 'Creepster', cursive;
-            font-size: 42px;
-            font-weight: 400;
-            letter-spacing: .5px;
+            margin: 23px 0 5px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 35px;
+            font-weight: 700;
         }
 
         .card-description {
-            margin: 10px 0 25px;
+            margin: 0 0 24px;
             color: var(--muted);
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 700;
             line-height: 1.7;
         }
 
         .auth-error {
-            margin: 0 0 20px;
             padding: 12px 14px;
-            border: 1px solid rgba(255,70,90,.38);
-            background: rgba(100,10,23,.3);
-            color: #ffb6bd;
-            font-size: 12px;
-            line-height: 1.6;
+            border: 2px solid #e75c78;
+            border-radius: 12px;
+            background: #fff0f2;
+            color: #bd304f;
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.5;
         }
 
-        .field { margin-top: 17px; }
+        .field {
+            margin-top: 17px;
+        }
 
         .field label {
             display: block;
-            margin-bottom: 8px;
-            color: #e7dfe1;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            margin-bottom: 7px;
+            font-size: 12px;
+            font-weight: 900;
         }
 
-        .input-wrap { position: relative; }
+        .input-wrap {
+            position: relative;
+        }
 
         .field input {
             width: 100%;
-            min-height: 48px;
+            min-height: 49px;
             padding: 13px 14px;
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: 2px;
+            border: 2px solid #e6e0ef;
+            border-radius: 12px;
             outline: none;
-            background: rgba(0,0,0,.42);
-            color: #fff;
-            font: inherit;
+            background: #fcfaff;
+            color: var(--ink);
+            font-family: inherit;
             font-size: 13px;
-            transition: border-color .2s, box-shadow .2s, background .2s;
+            font-weight: 700;
+            transition: .2s;
         }
 
-        .field input::placeholder { color: #71676b; }
+        .field input::placeholder {
+            color: #aaa4b5;
+        }
 
         .field input:focus {
-            border-color: var(--red);
-            background: rgba(20,5,8,.75);
-            box-shadow: 0 0 0 3px rgba(237,38,56,.09);
+            border-color: var(--purple);
+            background: white;
+            box-shadow: 0 0 0 4px #7046c81c;
         }
 
-        .password-input { padding-right: 72px !important; }
+        .password-input {
+            padding-right: 75px !important;
+        }
 
         .toggle-password {
             position: absolute;
             top: 50%;
-            right: 10px;
+            right: 12px;
             transform: translateY(-50%);
-            padding: 7px;
-            border: 0;
+            padding: 6px;
+            border: none;
             background: transparent;
-            color: #b9abad;
-            font: inherit;
-            font-size: 10px;
+            color: var(--purple);
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 900;
             cursor: pointer;
         }
-
-        .toggle-password:hover { color: #fff; }
 
         .submit-button {
             width: 100%;
-            min-height: 50px;
-            margin-top: 26px;
-            border: 1px solid var(--red);
-            border-radius: 2px;
-            background: var(--red);
-            color: #fff;
-            font: inherit;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            min-height: 52px;
+            margin-top: 25px;
+            border: 2px solid var(--ink);
+            border-radius: 13px;
+            background: var(--purple);
+            color: white;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background .25s, box-shadow .25s, transform .25s;
+            box-shadow: 0 5px 0 var(--ink);
+            transition: .2s;
         }
 
         .submit-button:hover {
-            background: #c91629;
-            box-shadow: 0 0 28px rgba(237,38,56,.3);
-            transform: translateY(-1px);
+            background: var(--purple-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 var(--ink);
         }
 
-        .submit-button:active { transform: translateY(0); }
+        .submit-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 var(--ink);
+        }
 
         .auth-footer {
-            margin: 24px 0 0;
+            margin: 22px 0 0;
             text-align: center;
             color: var(--muted);
             font-size: 12px;
-            line-height: 1.8;
+            font-weight: 700;
         }
 
-        .auth-footer a,
-        .back-link {
-            color: #ff7c87;
-            text-decoration: none;
-            transition: color .2s;
+        .auth-footer a {
+            color: var(--purple);
+            font-weight: 900;
         }
 
-        .auth-footer a { font-weight: 700; }
-
-        .auth-footer a:hover,
-        .back-link:hover { color: #fff; }
-
-        .back-link {
-            position: relative;
-            z-index: 2;
-            color: #ddd0d3;
-            font-size: 11px;
-            letter-spacing: .5px;
+        .auth-footer a:hover {
+            color: #ff7896;
         }
 
         .card-bottom {
             display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 25px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255,255,255,.09);
-            color: #817478;
-            font-size: 9px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            margin-right: 6px;
-            border-radius: 50%;
-            background: var(--red);
-            box-shadow: 0 0 9px var(--red);
-            animation: pulse 1.8s infinite;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+            padding-top: 17px;
+            border-top: 1px solid #eee9f4;
+            color: #9690a3;
+            font-size: 10px;
+            font-weight: 800;
         }
 
         .page-footer {
-            position: relative;
-            z-index: 2;
-            padding: 0 6% 20px;
-            color: rgba(230,220,222,.45);
+            padding: 0 20px 22px;
+            color: #8b8497;
             text-align: center;
-            font-size: 10px;
-            letter-spacing: 1px;
+            font-size: 11px;
+            font-weight: 800;
         }
 
-        @keyframes backgroundReveal {
-            from { opacity: .35; }
-            to { opacity: 1; }
+        @keyframes appear {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        @keyframes slowZoom {
-            from { transform: scale(1.04); }
-            to { transform: scale(1.12); }
-        }
-
-        @keyframes fogDrift {
-            from { transform: translateX(-5%) translateY(0); opacity: .45; }
-            to { transform: translateX(5%) translateY(-12%); opacity: .85; }
-        }
-
-        @keyframes riseIn {
-            from { opacity: 0; transform: translateY(22px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes cardReveal {
-            from { opacity: 0; transform: translateY(20px) scale(.985); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .35; }
+        @keyframes bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
         }
 
         @media (max-width: 900px) {
             .layout {
                 grid-template-columns: 1fr;
-                max-width: 560px;
+                max-width: 500px;
                 gap: 35px;
-                padding-top: 30px;
             }
 
-            .intro { text-align: center; }
-            .eyebrow { justify-content: center; }
+            .intro {
+                text-align: center;
+            }
 
-            .intro h1 { font-size: clamp(58px, 12vw, 85px); }
+            .intro-copy {
+                margin-inline: auto;
+            }
 
-            .intro-copy { margin-inline: auto; }
-            .warning { justify-content: center; }
-            .auth-card { padding: 30px; }
+            .cartoon-scene {
+                margin-inline: auto;
+            }
         }
 
         @media (max-width: 480px) {
-            .topbar { padding: 20px; }
-            .brand { font-size: 25px; }
-            .layout { padding: 20px 18px 40px; }
-            .intro h1 { font-size: 58px; }
-            .auth-card { padding: 25px 20px; }
-            .auth-card h2 { font-size: 37px; }
-            .card-bottom { font-size: 8px; }
+            .topbar {
+                padding: 19px 5%;
+            }
+
+            .brand {
+                font-size: 25px;
+            }
+
+            .layout {
+                width: 91%;
+                padding-top: 12px;
+            }
+
+            .intro h1 {
+                font-size: 58px;
+            }
+
+            .auth-card {
+                padding: 25px 20px;
+                box-shadow: 6px 7px 0 var(--ink);
+            }
+
+            .cartoon-scene {
+                height: 205px;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -553,351 +547,151 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-    <canvas id="rain" aria-hidden="true"></canvas>
-    <div class="fog" aria-hidden="true"></div>
 
-    <header class="topbar">
-        <a class="brand" href="index.php">GHOST <span>HEIST</span></a>
-        <button class="sound-button" id="soundToggle" type="button"
-                aria-pressed="false">♫ SOUND OFF</button>
-    </header>
+<header class="topbar">
+    <a href="index.php" class="brand">GHOST <span>HEIST</span></a>
+    <a href="login.php" class="top-link">Already a player? Log in →</a>
+</header>
 
-    <main class="layout">
-        <section class="intro">
-            <div class="eyebrow">Your nightmare begins here</div>
-            <h1>ENTER THE <span>UNKNOWN</span></h1>
-            <p class="intro-copy">
-                Every locked door hides a secret. Every shadow hides a watcher.
-                Create your identity, enter the mansion, and prove you can
-                escape with the treasure.
+<main class="layout">
+
+    <section class="intro">
+        <span class="intro-label">🎮 YOUR ADVENTURE STARTS HERE</span>
+
+        <h1>
+            READY TO
+            <span>JOIN THE HEIST?</span>
+        </h1>
+
+        <p class="intro-copy">
+            Create your player account and get ready for a sneaky adventure!
+            Explore colourful rooms, avoid the guards, solve puzzles and
+            collect the treasure.
+        </p>
+
+        <div class="cartoon-scene" aria-label="Cartoon game room illustration">
+            <div class="scene-window"></div>
+            <div class="scene-door"></div>
+            <div class="scene-star">✦</div>
+            <div class="cartoon-character" aria-hidden="true">🥷</div>
+            <div class="scene-floor"></div>
+            <div class="scene-caption">MISSION: GET THE TREASURE!</div>
+        </div>
+    </section>
+
+    <section class="auth-card" aria-labelledby="register-title">
+
+        <div class="card-top">
+            <div class="card-icon" aria-hidden="true">🎮</div>
+            <span class="card-tag">NEW PLAYER</span>
+        </div>
+
+        <h2 id="register-title">Create Account</h2>
+
+        <p class="card-description">
+            Set up your player identity and enter the game!
+        </p>
+
+        <?php if ($error !== ''): ?>
+            <p class="auth-error" role="alert">
+                <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
             </p>
+        <?php endif; ?>
 
-            <div class="warning">
-                <span class="warning-mark" aria-hidden="true">!</span>
-                <span>Some doors should never be opened.</span>
+        <form action="register.php" method="POST">
+
+            <div class="field">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    minlength="3"
+                    maxlength="50"
+                    autocomplete="username"
+                    placeholder="Choose your player name"
+                    required
+                >
             </div>
-        </section>
 
-        <section class="auth-card" aria-labelledby="register-title">
-            <a class="back-link" href="index.php">&larr; Return to the entrance</a>
-
-            <div class="card-symbol" aria-hidden="true">☠</div>
-            <p class="card-kicker">New player registration</p>
-            <h2 id="register-title">Join the Heist</h2>
-            <p class="card-description">
-                Create your player identity. The mansion is waiting.
-            </p>
-
-            <?php if ($error !== ''): ?>
-                <p class="auth-error" role="alert">
-                    <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
-                </p>
-            <?php endif; ?>
-
-            <form action="register.php" method="POST">
-                <div class="field">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username"
-                           minlength="3" maxlength="50"
-                           autocomplete="username"
-                           placeholder="Choose your identity" required>
-                </div>
-
-                <div class="field">
-                    <label for="email">Email address</label>
-                    <input type="email" id="email" name="email"
-                           maxlength="100" autocomplete="email"
-                           placeholder="you@example.com" required>
-                </div>
-
-                <div class="field">
-                    <label for="password">Password</label>
-                    <div class="input-wrap">
-                        <input class="password-input" type="password"
-                               id="password" name="password"
-                               minlength="8" autocomplete="new-password"
-                               placeholder="At least 8 characters" required>
-                        <button class="toggle-password" type="button"
-                                data-target="password" aria-pressed="false">
-                            SHOW
-                        </button>
-                    </div>
-                </div>
-
-                <button class="submit-button" type="submit">
-                    Create My Account &rarr;
-                </button>
-            </form>
-
-            <p class="auth-footer">
-                Already entered the mansion?
-                <a href="login.php">Log in here</a>
-            </p>
-
-            <div class="card-bottom">
-                <span><i class="status-dot"></i> Mansion online</span>
-                <span>Proceed at your own risk</span>
+            <div class="field">
+                <label for="email">Email address</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    maxlength="100"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                    required
+                >
             </div>
-        </section>
-    </main>
 
-    <footer class="page-footer">
-        GHOST HEIST &bull; THINK FAST. TRUST NO SHADOW.
-    </footer>
+            <div class="field">
+                <label for="password">Password</label>
 
-    <script>
-        // Animated rain
-        (() => {
-            const canvas = document.getElementById('rain');
-            const ctx = canvas.getContext('2d');
-            const reduceMotion = window.matchMedia(
-                '(prefers-reduced-motion: reduce)'
-            ).matches;
+                <div class="input-wrap">
+                    <input
+                        class="password-input"
+                        type="password"
+                        id="password"
+                        name="password"
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="At least 8 characters"
+                        required
+                    >
 
-            let width = 0;
-            let height = 0;
-            let drops = [];
+                    <button
+                        class="toggle-password"
+                        type="button"
+                        id="togglePassword"
+                        aria-pressed="false"
+                    >
+                        SHOW
+                    </button>
+                </div>
+            </div>
 
-            function resize() {
-                const ratio = Math.min(window.devicePixelRatio || 1, 2);
-                width = window.innerWidth;
-                height = window.innerHeight;
+            <button class="submit-button" type="submit">
+                Create My Account →
+            </button>
 
-                canvas.width = width * ratio;
-                canvas.height = height * ratio;
-                canvas.style.width = width + 'px';
-                canvas.style.height = height + 'px';
+        </form>
 
-                ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        <p class="auth-footer">
+            Already have an account?
+            <a href="login.php">Log in here</a>
+        </p>
 
-                drops = Array.from(
-                    { length: Math.min(Math.floor(width / 5), 260) },
-                    () => ({
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        length: 8 + Math.random() * 20,
-                        speed: 5 + Math.random() * 9
-                    })
-                );
-            }
+        <div class="card-bottom">
+            <span>⭐ THINK FAST</span>
+            <span>•</span>
+            <span>STAY SNEAKY</span>
+            <span>•</span>
+            <span>💰 GET THE TREASURE</span>
+        </div>
 
-            function draw() {
-                ctx.clearRect(0, 0, width, height);
-                ctx.strokeStyle = 'rgba(190,195,210,.32)';
-                ctx.lineWidth = .7;
-                ctx.beginPath();
+    </section>
 
-                drops.forEach(drop => {
-                    ctx.moveTo(drop.x, drop.y);
-                    ctx.lineTo(drop.x - 2, drop.y + drop.length);
-                    drop.y += drop.speed;
-                    drop.x -= .8;
+</main>
 
-                    if (drop.y > height) {
-                        drop.y = -drop.length;
-                        drop.x = Math.random() * width;
-                    }
+<footer class="page-footer">
+    GHOST HEIST © 2026 · YOUR NEXT ADVENTURE AWAITS!
+</footer>
 
-                    if (drop.x < 0) drop.x = width;
-                });
+<script>
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
 
-                ctx.stroke();
-                if (!reduceMotion) requestAnimationFrame(draw);
-            }
+    togglePassword.addEventListener('click', function () {
+        const showPassword = passwordInput.type === 'password';
 
-            resize();
-            window.addEventListener('resize', resize);
-            draw();
-        })();
+        passwordInput.type = showPassword ? 'text' : 'password';
+        togglePassword.textContent = showPassword ? 'HIDE' : 'SHOW';
+        togglePassword.setAttribute('aria-pressed', String(showPassword));
+    });
+</script>
 
-        // Password visibility toggle
-        document.querySelectorAll('.toggle-password').forEach(button => {
-            button.addEventListener('click', () => {
-                const input = document.getElementById(button.dataset.target);
-                const show = input.type === 'password';
-
-                input.type = show ? 'text' : 'password';
-                button.textContent = show ? 'HIDE' : 'SHOW';
-                button.setAttribute('aria-pressed', String(show));
-            });
-        });
-
-        // Horror ambience: drone + wind noise.
-        // Sound starts only after the user clicks the sound button.
-        (() => {
-            const button = document.getElementById('soundToggle');
-
-            let audioContext = null;
-            let masterGain = null;
-            let soundNodes = [];
-            let isPlaying = false;
-            let stopping = false;
-
-            function disconnectNodes() {
-                soundNodes.forEach(node => {
-                    try {
-                        if (typeof node.stop === 'function') node.stop();
-                    } catch (_) {}
-
-                    try {
-                        node.disconnect();
-                    } catch (_) {}
-                });
-
-                soundNodes = [];
-            }
-
-            async function startSound() {
-                const AudioContextClass =
-                    window.AudioContext || window.webkitAudioContext;
-
-                if (!AudioContextClass) {
-                    button.textContent = 'AUDIO NOT SUPPORTED';
-                    return;
-                }
-
-                if (isPlaying || stopping) return;
-
-                try {
-                    if (!audioContext || audioContext.state === 'closed') {
-                        audioContext = new AudioContextClass();
-                    }
-
-                    await audioContext.resume();
-
-                    const now = audioContext.currentTime;
-
-                    masterGain = audioContext.createGain();
-                    masterGain.gain.setValueAtTime(0.0001, now);
-                    masterGain.gain.exponentialRampToValueAtTime(
-                        0.20, now + 1.5
-                    );
-                    masterGain.connect(audioContext.destination);
-
-                    // Layered low-frequency haunted drone
-                    [65.41, 82.41, 110, 130.81, 164.81].forEach(
-                        (frequency, index) => {
-                            const oscillator = audioContext.createOscillator();
-                            const volume = audioContext.createGain();
-                            const filter = audioContext.createBiquadFilter();
-
-                            oscillator.type = index === 2 ? 'triangle' : 'sine';
-                            oscillator.frequency.value = frequency;
-
-                            volume.gain.value =
-                                [0.24, 0.17, 0.10, 0.07, 0.05][index];
-
-                            filter.type = 'lowpass';
-                            filter.frequency.value = 650;
-
-                            oscillator.connect(filter);
-                            filter.connect(volume);
-                            volume.connect(masterGain);
-                            oscillator.start();
-
-                            soundNodes.push(oscillator, volume, filter);
-                        }
-                    );
-
-                    // Slow volume pulse
-                    const pulse = audioContext.createOscillator();
-                    const pulseDepth = audioContext.createGain();
-
-                    pulse.frequency.value = 0.14;
-                    pulseDepth.gain.value = 0.025;
-                    pulse.connect(pulseDepth);
-                    pulseDepth.connect(masterGain.gain);
-                    pulse.start();
-
-                    soundNodes.push(pulse, pulseDepth);
-
-                    // Filtered noise for a windy atmosphere
-                    const length = audioContext.sampleRate * 3;
-                    const noiseBuffer = audioContext.createBuffer(
-                        1, length, audioContext.sampleRate
-                    );
-                    const samples = noiseBuffer.getChannelData(0);
-
-                    for (let i = 0; i < length; i++) {
-                        samples[i] = Math.random() * 2 - 1;
-                    }
-
-                    const wind = audioContext.createBufferSource();
-                    const windFilter = audioContext.createBiquadFilter();
-                    const windVolume = audioContext.createGain();
-
-                    wind.buffer = noiseBuffer;
-                    wind.loop = true;
-
-                    windFilter.type = 'lowpass';
-                    windFilter.frequency.value = 700;
-                    windVolume.gain.value = 0.13;
-
-                    wind.connect(windFilter);
-                    windFilter.connect(windVolume);
-                    windVolume.connect(masterGain);
-                    wind.start();
-
-                    soundNodes.push(wind, windFilter, windVolume);
-
-                    isPlaying = true;
-                    button.textContent = '♫ SOUND ON';
-                    button.setAttribute('aria-pressed', 'true');
-                } catch (error) {
-                    console.error('Ghost Heist audio error:', error);
-                    disconnectNodes();
-
-                    if (masterGain) {
-                        try { masterGain.disconnect(); } catch (_) {}
-                    }
-
-                    masterGain = null;
-                    button.textContent = 'SOUND ERROR - TRY AGAIN';
-                }
-            }
-
-            function stopSound() {
-                if (!audioContext || !masterGain || !isPlaying) return;
-
-                isPlaying = false;
-                stopping = true;
-
-                const oldMaster = masterGain;
-                const now = audioContext.currentTime;
-
-                oldMaster.gain.cancelScheduledValues(now);
-                oldMaster.gain.setTargetAtTime(0.0001, now, 0.12);
-
-                button.textContent = '♫ SOUND OFF';
-                button.setAttribute('aria-pressed', 'false');
-
-                const oldNodes = soundNodes;
-                soundNodes = [];
-                masterGain = null;
-
-                window.setTimeout(() => {
-                    oldNodes.forEach(node => {
-                        try {
-                            if (typeof node.stop === 'function') node.stop();
-                        } catch (_) {}
-
-                        try { node.disconnect(); } catch (_) {}
-                    });
-
-                    try { oldMaster.disconnect(); } catch (_) {}
-
-                    stopping = false;
-                }, 600);
-            }
-
-            button.addEventListener('click', () => {
-                if (isPlaying) {
-                    stopSound();
-                } else {
-                    startSound();
-                }
-            });
-        })();
-    </script>
 </body>
 </html>
