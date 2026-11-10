@@ -1114,6 +1114,16 @@ let grannyPatrolIndex = 1;
 // Kitchen-only patrol route.
 // The Postie walks around the furniture.
 const kitchenGrannyPatrolPoints = [{ x: 430, y: 455 }, { x: 552, y: 455 }, { x: 552, y: 240 }, { x: 220, y: 240 }, { x: 220, y: 455 }, { x: 430, y: 455 }];
+// Treasure Room route: go around the right side of the chest.
+const treasureGrannyPatrolPoints = [
+    { x: 430, y: 455 },
+    { x: 520, y: 480 },
+    { x: 790, y: 480 },
+    { x: 790, y: 240 },
+    { x: 350, y: 240 },
+    { x: 350, y: 455 },
+    { x: 430, y: 455 }
+];
 
 // Granny's animated character sprites
 const grannySprites = {
@@ -1943,13 +1953,57 @@ const roomSpriteFiles = {
     shelf: 'kitchen/long_wall_shelf_with_mugs_hanging_below.png',
     toaster: 'kitchen/toaster_with_toast_popping_up.png',
     bread: 'kitchen/bread_bin.png',
+        // Treasure Room furniture and decorations.
+    treasureBookshelf: 'living_room/variants/tall_bookshelf_with_books__white_paint.png',
+    treasureSofa: 'living_room/variants/three_seat_sofa__lavender.png',
+    treasureArmchair: 'living_room/variants/armchair__baby_blue.png',
+    treasureCoffeeTable: 'living_room/variants/low_coffee_table__white_paint.png',
+    treasureRug: 'living_room/variants/large_patterned_rug__baby_blue.png',
+    treasurePouf: 'living_room/variants/knitted_pouf__turquoise.png',
+    treasureFloorLamp: 'living_room/floor_lamp.png',
+    treasureMonstera: 'living_room/potted_monstera_plant.png',
+    treasureFiddleLeaf: 'living_room/potted_fiddle_leaf_fig.png',
+    treasureBooks: 'living_room/stack_of_books.png',
 
+    treasureWardrobe: 'bedroom/variants/wardrobe__white_paint.png',
+    treasureNightstand: 'bedroom/variants/nightstand_with_two_drawers__white_paint.png',
+    treasureTableLamp: 'bedroom/table_lamp.png',
+
+    treasureClock: 'decor/round_wall_clock.png',
+    treasureMirror: 'decor/round_wall_mirror.png',
+    treasureLantern: 'decor/candle_lantern.png',
+    treasureRoundRug: 'decor/variants/round_braided_rug__baby_blue.png',
+
+    treasureChestClosed: 'treasure_room/TreasureChestPack/Wooden_Angled_Closed.png',
+    treasureChestOpen: 'treasure_room/TreasureChestPack/Wooden_Angled_Open.png',
     roundRug: 'decor/round_braided_rug.png',
     lantern: 'decor/candle_lantern.png',
     fern: 'decor/potted_fern.png',
     flowers: 'decor/vase_of_daisies.png',
     wardrobe: 'bedroom/wardrobe.png',
-    bedroomRug: 'bedroom/fringed_bedroom_rug.png'
+    bedroomRug: 'bedroom/fringed_bedroom_rug.png',
+
+treasureBed: 'bedroom/variants/double_bed__cherry.png',
+treasureBedroomRug: 'bedroom/variants/fringed_bedroom_rug__baby_blue.png',
+treasureNightstand: 'bedroom/variants/nightstand_with_two_drawers__cherry.png',
+treasureWardrobe: 'bedroom/variants/wardrobe__cherry.png',
+treasureVanity: 'bedroom/variants/vanity_table_with_a_mirror__cherry.png',
+treasureTableLamp: 'bedroom/table_lamp.png',
+treasureSnakePlant: 'bedroom/potted_snake_plant.png',
+treasurePainting: 'bedroom/framed_flower_painting.png',
+treasureTeddy: 'bedroom/teddy_bear.png',
+
+treasureBathtub: 'bathroom/bathtub.png',
+treasureBathroomSink: 'bathroom/bathroom_sink_with_a_mirror.png',
+treasureToilet: 'bathroom/toilet.png',
+treasureSoap: 'bathroom/bar_of_soap.png',
+treasureSoapPump: 'bathroom/soap_pump_bottle.png',
+treasureShampoo: 'bathroom/shampoo_bottle.png',
+treasureTowels: 'bathroom/stack_of_folded_towels.png',
+treasureDuck: 'bathroom/rubber_duck.png',
+treasureToothbrush: 'bathroom/toothbrush_cup.png',
+
+treasureChestOpen: 'treasure_room/TreasureChestPack/Wooden_Angled_Open.png',
 };
 
 Object.entries(roomSpriteFiles).forEach(([name, file]) => {
@@ -2077,75 +2131,128 @@ function drawKitchen() {
    TREASURE ROOM
 ========================================== */
 
-function drawTreasureRoom() {
 
+
+
+
+function drawTreasureRoom() {
     drawFloorLayer();
     drawWalls();
 
-    // Decorative treasure-room floor.
-    drawRoomSprite('bedroomRug', 290, 365, 330, 155);
-    drawRoomSprite('roundRug', 590, 400, 190, 110);
-
-    // Furniture and decorations.
-    drawRoomSprite('wardrobe', 85, 205, 110, 210);
-    drawRoomSprite('bookshelf', 700, 170, 90, 150);
-    drawRoomSprite('lantern', 235, 245, 65, 90);
-    drawRoomSprite('fern', 790, 180, 65, 95);
-    drawRoomSprite('flowers', 440, 175, 65, 65);
-
-    // Treasure chest glow.
-    const glow = ctx.createRadialGradient(
-        755, 450, 15,
-        755, 450, 125
+    // Soft purple and golden bedroom atmosphere.
+    const bedroomGlow = ctx.createRadialGradient(
+        480, 280, 10,
+        480, 280, 380
     );
 
-    glow.addColorStop(0, 'rgba(255, 221, 105, 0.48)');
-    glow.addColorStop(1, 'rgba(255, 221, 105, 0)');
+    bedroomGlow.addColorStop(0, 'rgba(160, 125, 255, 0.16)');
+    bedroomGlow.addColorStop(1, 'rgba(160, 125, 255, 0)');
 
-    ctx.fillStyle = glow;
-    ctx.fillRect(610, 320, 290, 250);
+    ctx.fillStyle = bedroomGlow;
+    ctx.fillRect(64, 96, 772, 432);
 
-    // Chest shadow.
-    drawShadow(665, 410, 175, 110, 18);
+    // =====================================
+    // BEDROOM WALL DECORATION
+    // =====================================
 
-    // Chest body.
-    roundedRect(680, 430, 150, 75, 12, '#a85e35', '#63351e');
+    drawRoomSprite('treasurePainting', 365, 105, 75, 65);
 
-    // Golden front panel.
-    roundedRect(691, 443, 128, 49, 7, '#c47a39', '#f6c65d');
+    // =====================================
+    // MAIN BED AND RUG
+    // =====================================
 
-    // Chest lid.
-    roundedRect(670, 397, 170, 49, 17, '#754324', '#4d2a19');
+    drawRoomSprite(
+        'treasureBedroomRug',
+        245, 270, 350, 220
+    );
 
-    // Golden lid trim.
-    roundedRect(680, 405, 150, 10, 4, '#f4c65d', '#9b681f');
+    drawRoomSprite(
+        'treasureBed',
+        300, 130, 235, 195
+    );
 
-    // Golden chest bands.
-    roundedRect(704, 430, 12, 75, 3, '#f7d66e');
-    roundedRect(795, 430, 12, 75, 3, '#f7d66e');
+    drawRoomSprite(
+        'treasureTeddy',
+        445, 275, 45, 45
+    );
 
-    // Lock.
-    roundedRect(740, 443, 30, 35, 7, '#f5d46b', '#98671e');
+    // =====================================
+    // MATCHING BEDSIDE TABLES
+    // =====================================
 
-    ctx.fillStyle = '#71451f';
-    ctx.beginPath();
-    ctx.arc(755, 457, 5, 0, Math.PI * 2);
-    ctx.fill();
+    drawRoomSprite('treasureNightstand', 220, 160, 80, 90);
+    drawRoomSprite('treasureNightstand', 535, 160, 80, 90);
 
-    // Coins.
-    ctx.fillStyle = '#ffdf65';
+    drawRoomSprite('treasureTableLamp', 235, 140, 45, 50);
+    drawRoomSprite('treasureTableLamp', 550, 140, 45, 50);
 
-    [[700, 424], [720, 417], [790, 421], [810, 425]].forEach(([x, y]) => {
-        ctx.beginPath();
-        ctx.arc(x, y, 8, 0, Math.PI * 2);
-        ctx.fill();
-    });
+    // =====================================
+    // WARDROBE AND DRESSING AREA
+    // =====================================
 
-    ctx.fillStyle = '#fff4ad';
-    ctx.font = 'bold 19px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('TREASURE', 755, 545);
+    drawRoomSprite(
+        'treasureWardrobe',
+        680, 130, 125, 175
+    );
+
+    drawRoomSprite(
+        'treasureVanity',
+        90, 330, 140, 125
+    );
+
+    drawRoomSprite(
+        'treasureSnakePlant',
+        115, 175, 65, 100
+    );
+
+    drawRoomSprite(
+        'treasureSnakePlant',
+        755, 390, 65, 100
+    );
+
+    // =====================================
+    // TREASURE CHEST
+    // =====================================
+
+    if (challengeCompleted) {
+
+        const treasureGlow = ctx.createRadialGradient(
+            700, 390, 5,
+            700, 390, 115
+        );
+
+        treasureGlow.addColorStop(
+            0,
+            'rgba(255, 210, 80, 0.65)'
+        );
+
+        treasureGlow.addColorStop(
+            1,
+            'rgba(255, 210, 80, 0)'
+        );
+
+        ctx.fillStyle = treasureGlow;
+        ctx.fillRect(590, 285, 220, 190);
+
+        // Treasure revealed!
+        drawRoomSprite(
+            'treasureChestOpen',
+            650, 345, 125, 115
+        );
+
+    } else {
+
+        // Closed chest is visible before solving the puzzle.
+        drawRoomSprite(
+            'treasureChestClosed',
+            650, 345, 125, 115
+        );
+    }
 }
+
+
+
+
 /* ==========================================
    FURNITURE COLLISION
 ========================================== */
@@ -2221,15 +2328,48 @@ const livingRoomExtraObstacles = [
 ];
 
 /* ==========================================
+   TREASURE ROOM FURNITURE COLLISION
+========================================== */
+
+const treasureRoomObstacles = [
+
+    // Bed.
+    { x: 230, y: 145, w: 190, h: 85 },
+
+    // Left bedside table.
+    { x: 180, y: 145, w: 65, h: 60 },
+
+    // Right bedside table.
+    { x: 500, y: 145, w: 70, h: 60 },
+
+    // Wardrobe.
+    { x: 620, y: 120, w: 120, h: 100 },
+
+    // Vanity.
+    { x: 64, y: 310, w: 100, h: 85 },
+
+    // Treasure chest.
+    { x: 590, y: 300, w: 120, h: 140 },
+
+    // Left plant.
+    { x: 90, y: 200, w: 45, h: 50 },
+
+    // Right plant.
+    { x: 730, y: 420, w: 45, h: 45 }
+
+];
+
+/* ==========================================
    GAME OBJECTS
 ========================================== */
 
 const sparklingObject = {
-    x: currentRoom === 2 ? 840 : 755,
-    y: currentRoom === 2 ? 180 : 475
+    x: currentRoom === 2 ? 840 : currentRoom === 3 ? 625 : 755,
+    y: currentRoom === 2 ? 180 : currentRoom === 3 ? 345 : 475
 };
 
 const INTERACTION_DISTANCE = 70;
+const TREASURE_INTERACTION_DISTANCE = 135;
 
 let lastTime = 0;
 let animationTime = 0;
@@ -2304,12 +2444,46 @@ window.addEventListener('blur', function() {
 
 interactButton.addEventListener('click', interact);
 
+canvas.addEventListener('click', function(event) {
+
+    if (currentRoom !== 3) {
+        return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+
+    const mouseX =
+        (event.clientX - rect.left) * (canvas.width / rect.width);
+
+    const mouseY =
+        (event.clientY - rect.top) * (canvas.height / rect.height);
+
+    // Clickable area around the visible treasure chest.
+    const clickedChest =
+        mouseX >= 585 &&
+        mouseX <= 715 &&
+        mouseY >= 285 &&
+        mouseY <= 405;
+
+    if (clickedChest) {
+        interact();
+    }
+
+});
+
 
 /* ==========================================
    INTERACTION DISTANCE
 ========================================== */
 
 function getInteractionDistance() {
+
+    if (currentRoom === 3) {
+        return Math.hypot(
+            player.x - 650,
+            player.y - 345
+        );
+    }
 
     return Math.hypot(
         player.x - sparklingObject.x,
@@ -2320,6 +2494,12 @@ function getInteractionDistance() {
 
 
 function updateInteractionPrompt() {
+
+    if (currentRoom === 3) {
+        interactionPrompt.style.display = 'none';
+        interactButton.style.display = 'none';
+        return;
+    }
 
     const nearby =
         getInteractionDistance() <= INTERACTION_DISTANCE &&
@@ -2340,7 +2520,7 @@ function collides(x, y) {
 
     const r = player.radius;
 
-    // Keep the player inside the actual room.
+    // Keep the player inside the room.
     if (
         x - r < 64 ||
         x + r > 836 ||
@@ -2350,15 +2530,24 @@ function collides(x, y) {
         return true;
     }
 
-    // Furniture collision.
-    const roomObstacles =
-    currentRoom === 2 ? kitchenObstacles : obstacles;
+    // Select only the furniture belonging to this room.
+    let roomObstacles;
 
-    const allObstacles = currentRoom === 1
-        ? [...roomObstacles, ...livingRoomExtraObstacles]
-        : roomObstacles;
+    if (currentRoom === 1) {
+        roomObstacles = [
+            ...obstacles,
+            ...livingRoomExtraObstacles
+        ];
+    }
+    else if (currentRoom === 2) {
+        roomObstacles = kitchenObstacles;
+    }
+    else {
+        roomObstacles = treasureRoomObstacles;
+    }
 
-    return allObstacles.some(obstacle =>
+    // Check whether the player's body touches furniture.
+    return roomObstacles.some(obstacle =>
 
         x + r > obstacle.x &&
         x - r < obstacle.x + obstacle.w &&
@@ -2368,6 +2557,8 @@ function collides(x, y) {
     );
 
 }
+
+
 
 
 /* ==========================================
@@ -2476,11 +2667,13 @@ function update(delta) {
 // Move Granny around her patrol route.
 // Kitchen uses its own route and furniture collision checks.
 const isKitchenRoom = currentRoom === 2;
+const isTreasureRoom = currentRoom === 3;
 
 const activePatrolPoints = isKitchenRoom
     ? kitchenGrannyPatrolPoints
-    : grannyPatrolPoints;
-
+    : isTreasureRoom
+        ? treasureGrannyPatrolPoints
+        : grannyPatrolPoints;
 const target = activePatrolPoints[grannyPatrolIndex];
 
 const moveX = target.x - granny.x;
@@ -2859,13 +3052,18 @@ async function interact() {
         return;
     }
 
-    if (getInteractionDistance() > INTERACTION_DISTANCE) {
+    const allowedDistance = currentRoom === 3
+    ? TREASURE_INTERACTION_DISTANCE
+    : INTERACTION_DISTANCE;
 
-        message.textContent =
-            'You are too far away! Move closer to the sparkling object.';
+if (getInteractionDistance() > allowedDistance) {
 
-        return;
-    }
+    message.textContent = currentRoom === 3
+        ? 'Move closer to the treasure chest!'
+        : 'You are too far away! Move closer to the sparkling object.';
+
+    return;
+}
 
     puzzleLoading = true;
 
@@ -3113,10 +3311,11 @@ function draw() {
 
     drawRoom();
 
-    drawSparkle();
+    if (currentRoom !== 3) {
+        drawSparkle();
+    }
 
     drawGranny();
-
     drawPlayer();
 
 }
