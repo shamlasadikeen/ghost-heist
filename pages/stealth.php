@@ -1111,6 +1111,10 @@ const grannyPatrolPoints = [
 
 let grannyPatrolIndex = 1;
 
+// Kitchen-only patrol route.
+// The Postie walks around the furniture.
+const kitchenGrannyPatrolPoints = [{ x: 430, y: 455 }, { x: 552, y: 455 }, { x: 552, y: 240 }, { x: 220, y: 240 }, { x: 220, y: 455 }, { x: 430, y: 455 }];
+
 // Granny's animated character sprites
 const grannySprites = {
     down: [],
@@ -2189,7 +2193,13 @@ const kitchenObstacles = [
     { x: 625, y: 235, w: 165, h: 170 },
 
     // Kitchen island.
-    { x: 290, y: 300, w: 280, h: 140 }
+    { x: 326, y: 300, w: 208, h: 145 },
+
+    // Kitchen chairs.
+    { x: 570, y: 390, w: 65, h: 85 },
+
+
+    { x: 705, y: 390, w: 65, h: 85 }
 
 ];
 
@@ -2462,7 +2472,16 @@ function update(delta) {
 
         
 // Move Granny around her rectangular patrol route.
-const target = grannyPatrolPoints[grannyPatrolIndex];
+
+// Move Granny around her patrol route.
+// Kitchen uses its own route and furniture collision checks.
+const isKitchenRoom = currentRoom === 2;
+
+const activePatrolPoints = isKitchenRoom
+    ? kitchenGrannyPatrolPoints
+    : grannyPatrolPoints;
+
+const target = activePatrolPoints[grannyPatrolIndex];
 
 const moveX = target.x - granny.x;
 const moveY = target.y - granny.y;
@@ -2470,19 +2489,80 @@ const moveY = target.y - granny.y;
 const distance = Math.hypot(moveX, moveY);
 const movement = granny.speed * delta;
 
-if (distance <= movement) {
+const previousX = granny.x;
+const previousY = granny.y;
 
-    granny.x = target.x;
-    granny.y = target.y;
+if (!isKitchenRoom) {
 
-    grannyPatrolIndex =
-        (grannyPatrolIndex + 1) % grannyPatrolPoints.length;
+    // Preserve the original movement in other rooms.
+    if (distance <= movement) {
 
-} else if (distance > 0) {
+        granny.x = target.x;
+        granny.y = target.y;
 
-    granny.x += (moveX / distance) * movement;
-    granny.y += (moveY / distance) * movement;
+        grannyPatrolIndex =
+            (grannyPatrolIndex + 1) % activePatrolPoints.length;
+
+    } else if (distance > 0) {
+
+        granny.x += (moveX / distance) * movement;
+        granny.y += (moveY / distance) * movement;
+    }
+
+} else {
+
+    // Check the Postie's position against kitchen furniture.
+    const grannyRadius = 10;
+
+    function grannyHitsKitchenFurniture(x, y) {
+        return kitchenObstacles.some(obstacle =>
+            x + grannyRadius > obstacle.x &&
+            x - grannyRadius < obstacle.x + obstacle.w &&
+            y + grannyRadius > obstacle.y &&
+            y - grannyRadius < obstacle.y + obstacle.h
+        );
+    }
+
+    // Move in small steps to prevent passing through objects.
+    const steps = Math.max(1, Math.ceil(movement / 4));
+    const stepSize = movement / steps;
+
+    for (let i = 0; i < steps && distance > 0; i++) {
+
+        const remainingX = target.x - granny.x;
+        const remainingY = target.y - granny.y;
+        const remainingDistance = Math.hypot(remainingX, remainingY);
+
+        if (remainingDistance <= stepSize) {
+            break;
+        }
+
+        const nextX = granny.x +
+            (remainingX / remainingDistance) * stepSize;
+
+        const nextY = granny.y +
+            (remainingY / remainingDistance) * stepSize;
+
+        if (!grannyHitsKitchenFurniture(nextX, granny.y)) {
+            granny.x = nextX;
+        }
+
+        if (!grannyHitsKitchenFurniture(granny.x, nextY)) {
+            granny.y = nextY;
+        }
+    }
+
+    // Advance to the next patrol point when reached.
+    if (Math.hypot(target.x - granny.x, target.y - granny.y) <= 5) {
+
+        granny.x = target.x;
+        granny.y = target.y;
+
+        grannyPatrolIndex =
+            (grannyPatrolIndex + 1) % activePatrolPoints.length;
+    }
 }
+
 
 // Rotate Granny's vision cone in her walking direction.
 granny.angle = Math.atan2(moveY, moveX);
