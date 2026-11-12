@@ -10,17 +10,8 @@ if (!isset($_SESSION['user_id'])) {
 require_once __DIR__ . '/../config.php';
 
 $userId = (int) $_SESSION['user_id'];
-$difficulty = $_GET['difficulty'] ?? 'beginner';
-
-$levels = [
-    'beginner' => 'Beginner',
-    'intermediate' => 'Intermediate',
-    'hard' => 'Hard'
-];
-
-if (!isset($levels[$difficulty])) {
-    $difficulty = 'beginner';
-}
+// Ghost Heist now has one fixed gameplay mode.
+$difficulty = 'beginner';
 
 /*
  * Three rooms for Ghost Heist.
@@ -930,21 +921,7 @@ $progressPercentage = (int) round(
 
             <h2>🗺️ Explore the Rooms</h2>
 
-            <nav class="difficulty-switch" aria-label="Choose difficulty">
-
-                <?php foreach ($levels as $key => $label): ?>
-
-                    <a
-                        href="rooms.php?difficulty=<?= urlencode($key) ?>"
-                        class="<?= $difficulty === $key ? 'active' : '' ?>"
-                        <?= $difficulty === $key ? 'aria-current="page"' : '' ?>
-                    >
-                        <?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?>
-                    </a>
-
-                <?php endforeach; ?>
-
-            </nav>
+            <span class="mode-label">Classic Mode</span>
 
         </div>
 
@@ -1059,7 +1036,7 @@ $progressPercentage = (int) round(
             <?php if ($allCompleted): ?>
 
                 <strong>Fantastic! All three rooms completed!</strong>
-                You've conquered this difficulty and collected the treasure.
+                You've completed Classic Mode and collected the treasure.
 
             <?php else: ?>
 
@@ -1086,5 +1063,6 @@ $progressPercentage = (int) round(
 
 </main>
 
+<script src="../assets/js/site-ambience.js"></script>
 </body>
 </html>

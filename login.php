@@ -600,5 +600,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     });
 </script>
 
+<script src="assets/js/site-ambience.js"></script>
 </body>
 </html>

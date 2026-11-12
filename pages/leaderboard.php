@@ -1008,5 +1008,6 @@ foreach ($players as $index => $player) {
 
 </main>
 
+<script src="../assets/js/site-ambience.js"></script>
 </body>
 </html>

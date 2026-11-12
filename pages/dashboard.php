@@ -201,10 +201,11 @@ $safeUsername = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
         }
 
         .difficulty-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 22px;
-        }
+    display: grid;
+    grid-template-columns: minmax(280px, 520px);
+    justify-content: center;
+    gap: 22px;
+}
 
         .difficulty-card {
             border: 3px solid var(--navy);
@@ -221,17 +222,9 @@ $safeUsername = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
             transform: translateY(-6px) rotate(-1deg);
         }
 
-        .difficulty-card.beginner {
-            background: #baf0d1;
-        }
-
-        .difficulty-card.intermediate {
-            background: #ffe59a;
-        }
-
-        .difficulty-card.hard {
-            background: #ffc0d1;
-        }
+        .difficulty-card.classic {
+    background: #baf0d1;
+}
 
         .difficulty-icon {
             font-size: 50px;
@@ -411,68 +404,40 @@ $safeUsername = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
 
             <p>
                 Welcome back, sneaky thief! Your next adventure is waiting.
-                Choose your difficulty, avoid the guards, solve the puzzles
-                and collect that treasure!
+                Explore three rooms, avoid the guards, solve the puzzles
+and collect the treasure!
             </p>
         </div>
 
         <div class="welcome-character">🥷</div>
     </section>
 
-    <h2 class="section-title">Choose Your Challenge 🎮</h2>
+    <h2 class="section-title">Your Adventure 🎮</h2>
 
     <p class="section-description">
-        Pick your difficulty and get ready for the heist!
+         Enter Classic Mode and get ready for the heist!
     </p>
 
     <section class="difficulty-grid">
 
-        <article class="difficulty-card beginner">
-            <div class="difficulty-icon">🌱</div>
+    <article class="difficulty-card classic">
 
-            <h3>Beginner</h3>
+        <div class="difficulty-icon">🎮</div>
 
-            <p>
-                New to sneaky adventures? Start here!
-                Explore at your own pace and learn the basics.
-            </p>
+        <h3>Classic Mode</h3>
 
-            <a href="rooms.php?difficulty=beginner" class="play-button">
-                Start Easy Adventure →
-            </a>
-        </article>
+        <p>
+            Enter the heist, explore three exciting rooms,
+            avoid Granny, solve the puzzles and find the treasure!
+        </p>
 
-        <article class="difficulty-card intermediate">
-            <div class="difficulty-icon">⚡</div>
+        <a href="rooms.php" class="play-button">
+            Start Your Adventure →
+        </a>
 
-            <h3>Intermediate</h3>
+    </article>
 
-            <p>
-                Ready for a bigger challenge? Stay alert,
-                plan your moves and avoid the guards.
-            </p>
-
-            <a href="rooms.php?difficulty=intermediate" class="play-button">
-                Take the Challenge →
-            </a>
-        </article>
-
-        <article class="difficulty-card hard">
-            <div class="difficulty-icon">🔥</div>
-
-            <h3>Hard</h3>
-
-            <p>
-                Think you have what it takes?
-                Test your stealth skills in the toughest challenge.
-            </p>
-
-            <a href="rooms.php?difficulty=hard" class="play-button">
-                Go Pro →
-            </a>
-        </article>
-
-    </section>
+</section>
 
     <section class="bottom-grid">
 
@@ -516,5 +481,6 @@ $safeUsername = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     </p>
 </footer>
 
+<script src="../assets/js/site-ambience.js"></script>
 </body>
 </html>

@@ -10,11 +10,8 @@ require_once __DIR__ . '/../config.php';
 
 $userId = (int) $_SESSION['user_id'];
 
-$difficulty = $_GET['difficulty'] ?? 'beginner';
-
-if (!in_array($difficulty, ['beginner', 'intermediate', 'hard'], true)) {
-    $difficulty = 'beginner';
-}
+// Ghost Heist has one fixed gameplay mode.
+$difficulty = 'beginner';
 
 $room = filter_var(
     $_GET['room'] ?? 1,
@@ -816,8 +813,8 @@ footer {
             <p>Explore the room, avoid danger and find the sparkling object.</p>
         </div>
 
-        <span class="difficulty">
-            <?= htmlspecialchars(ucfirst($difficulty), ENT_QUOTES, 'UTF-8') ?> Mode
+        <span class="difficulty">Classic Mode</span>
+
         </span>
     </section>
 
@@ -966,6 +963,7 @@ footer {
 
 </main>
 
+<script src="../assets/js/game-sounds.js"></script>
 <script>
 
 /* ==========================================
@@ -1001,6 +999,11 @@ function endGame(reason) {
     if (gameEnded) return;
 
     gameEnded = true;
+
+    if (reason.includes('Granny spotted you')) {
+        playGameSound('caught');
+    }
+
     gameOverReason.textContent = reason;
     gameOverScreen.style.display = 'flex';
 }
@@ -1010,7 +1013,7 @@ tryAgainButton.addEventListener('click', function() {
 });
 
 const currentRoom = <?= (int)$room ?>;
-const currentDifficulty = <?= json_encode($difficulty) ?>;
+const currentDifficulty = 'beginner';
 
 let puzzleLoading = false;
 let challengeCompleted = false;
@@ -1115,15 +1118,26 @@ let grannyPatrolIndex = 1;
 // The Postie walks around the furniture.
 const kitchenGrannyPatrolPoints = [{ x: 430, y: 455 }, { x: 552, y: 455 }, { x: 552, y: 240 }, { x: 220, y: 240 }, { x: 220, y: 455 }, { x: 430, y: 455 }];
 // Treasure Room route: go around the right side of the chest.
+
 const treasureGrannyPatrolPoints = [
+    // Start and walk right, stopping before the chest.
     { x: 430, y: 455 },
-    { x: 520, y: 480 },
-    { x: 790, y: 480 },
-    { x: 790, y: 240 },
-    { x: 350, y: 240 },
-    { x: 350, y: 455 },
+    { x: 550, y: 455 },
+
+    // Turn up through the clear gap.
+    { x: 550, y: 350 },
+
+    // Turn left and follow the full white carpet.
+    { x: 280, y: 350 },
+
+    // At the end of the carpet, turn down.
+   { x: 280, y: 455 },
+
+    // Return to the starting point and repeat.
     { x: 430, y: 455 }
 ];
+
+
 
 // Granny's animated character sprites
 const grannySprites = {
@@ -2373,6 +2387,8 @@ const TREASURE_INTERACTION_DISTANCE = 135;
 
 let lastTime = 0;
 let animationTime = 0;
+let footstepTimer = 0;
+const FOOTSTEP_INTERVAL = 0.4;
 
 
 /* ==========================================
@@ -2661,10 +2677,7 @@ function update(delta) {
         }
     }
 
-        
-// Move Granny around her rectangular patrol route.
 
-// Move Granny around her patrol route.
 // Kitchen uses its own route and furniture collision checks.
 const isKitchenRoom = currentRoom === 2;
 const isTreasureRoom = currentRoom === 3;
@@ -2685,9 +2698,12 @@ const movement = granny.speed * delta;
 const previousX = granny.x;
 const previousY = granny.y;
 
-if (!isKitchenRoom) {
 
-    // Preserve the original movement in other rooms.
+// Select the furniture belonging to the current room.
+
+// Keep the original Living Room patrol behaviour unchanged.
+if (currentRoom === 1) {
+
     if (distance <= movement) {
 
         granny.x = target.x;
@@ -2704,19 +2720,23 @@ if (!isKitchenRoom) {
 
 } else {
 
-    // Check the Postie's position against kitchen furniture.
-    const grannyRadius = 10;
+    // Select obstacles for the current room.
+    const postieObstacles = currentRoom === 2
+        ? kitchenObstacles
+        : treasureRoomObstacles;
 
-    function grannyHitsKitchenFurniture(x, y) {
-        return kitchenObstacles.some(obstacle =>
-            x + grannyRadius > obstacle.x &&
-            x - grannyRadius < obstacle.x + obstacle.w &&
-            y + grannyRadius > obstacle.y &&
-            y - grannyRadius < obstacle.y + obstacle.h
+    const postieRadius = currentRoom === 3 ? 28 : 10;
+
+    function postieHitsFurniture(x, y) {
+        return postieObstacles.some(obstacle =>
+            x + postieRadius > obstacle.x &&
+            x - postieRadius < obstacle.x + obstacle.w &&
+            y + postieRadius > obstacle.y &&
+            y - postieRadius < obstacle.y + obstacle.h
         );
     }
 
-    // Move in small steps to prevent passing through objects.
+    // Move in small steps to prevent passing through furniture.
     const steps = Math.max(1, Math.ceil(movement / 4));
     const stepSize = movement / steps;
 
@@ -2736,23 +2756,26 @@ if (!isKitchenRoom) {
         const nextY = granny.y +
             (remainingY / remainingDistance) * stepSize;
 
-        if (!grannyHitsKitchenFurniture(nextX, granny.y)) {
+        if (!postieHitsFurniture(nextX, granny.y)) {
             granny.x = nextX;
         }
 
-        if (!grannyHitsKitchenFurniture(granny.x, nextY)) {
+        if (!postieHitsFurniture(granny.x, nextY)) {
             granny.y = nextY;
         }
     }
 
-    // Advance to the next patrol point when reached.
+    // Advance when the next patrol point is reached.
     if (Math.hypot(target.x - granny.x, target.y - granny.y) <= 5) {
 
-        granny.x = target.x;
-        granny.y = target.y;
+        if (!postieHitsFurniture(target.x, target.y)) {
 
-        grannyPatrolIndex =
-            (grannyPatrolIndex + 1) % activePatrolPoints.length;
+            granny.x = target.x;
+            granny.y = target.y;
+
+            grannyPatrolIndex =
+                (grannyPatrolIndex + 1) % activePatrolPoints.length;
+        }
     }
 }
 
@@ -2767,7 +2790,19 @@ if (gameEnded) {
     return;
 }
 
-    animationTime += delta;
+// Play footsteps at intervals while the player is moving.
+if (player.isMoving) {
+    footstepTimer += delta;
+
+    if (footstepTimer >= FOOTSTEP_INTERVAL) {
+        playGameSound('footsteps');
+        footstepTimer = 0;
+    }
+} else {
+    footstepTimer = 0;
+}
+
+animationTime += delta;
 
     updateInteractionPrompt();
 }
@@ -3065,10 +3100,9 @@ if (getInteractionDistance() > allowedDistance) {
     return;
 }
 
-    puzzleLoading = true;
-
-    message.textContent =
-        'You discovered the hidden object! Loading puzzle...';
+puzzleLoading = true;
+playGameSound('interaction');
+message.textContent = 'You discovered the hidden object! Loading puzzle...';
 
     try {
 
@@ -3176,6 +3210,8 @@ answerForm.addEventListener('submit', async function(event) {
 
         if (data.correct === false) {
 
+	playGameSound('mistake');
+
             puzzleFeedback.textContent =
                 data.message || 'Incorrect answer! Please try again.';
 
@@ -3197,6 +3233,7 @@ answerForm.addEventListener('submit', async function(event) {
         answerForm.style.display = 'none';
 
         if (currentRoom === 1 || currentRoom === 2) {
+	playGameSound('success');
 
             const keysEarned =
                 Number(data.keysEarned) || currentRoom;
@@ -3220,6 +3257,7 @@ answerForm.addEventListener('submit', async function(event) {
                 data.message || 'You collected a wooden key!';
 
         } else {
+playGameSound('treasure');
 
     const goldEarned = Number(data.goldAwarded) || 1000;
 

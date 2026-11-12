@@ -649,5 +649,7 @@
     <p>© <?php echo date('Y'); ?> <span>Ghost Heist</span> · Sneak smart. Solve fast. Get rich!</p>
 </footer>
 
+<script src="assets/js/site-ambience.js"></script>
+
 </body>
 </html>
